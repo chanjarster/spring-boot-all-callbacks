@@ -20,12 +20,12 @@ public class SampleApplication {
 ### 初始化SpringApplication
 
 1. ``SpringApplication#run(Object source, String... args)``[#L1173][SpringApplicationL1173]
-1. [SpringApplication#L1185][SpringApplicationL1185] call ``SpringApplication(sources)``[#L236][SpringApplicationL236]
+1. [SpringApplication#L1185][SpringApplicationL1185] -> ``SpringApplication(sources)``[#L236][SpringApplicationL236]
   1. ``SpringApplication#initialize(Object[] sources)``[#L256][SpringApplicationL256] [javadoc][SpringApplication]
     1. [SpringApplication#L257][SpringApplicationL257] 添加source（复数），``SpringApplication``使用source来构建Bean。一般来说在``run``的时候都会把``@SpringBootApplication``标记的类放到``sources``参数里，然后由这个类出发找到Bean的定义。
     2. [SpringApplication#L261][SpringApplicationL261] 初始化``ApplicationContextInitializer``列表（见附录）
     3. [SpringApplication#L263][SpringApplicationL263] 初始化``ApplicationListener``列表（见附录）
-1. [SpringApplication#L1185][SpringApplicationL1185] call ``SpringApplication#run(args)``[#L297][SpringApplicationL297]，进入运行阶段
+1. [SpringApplication#L1185][SpringApplicationL1185] -> ``SpringApplication#run(args)``[#L297][SpringApplicationL297]，进入运行阶段
 
 所以在spring boot应用的初始化阶段只需要``ApplicationContextInitializer``和``ApplicationListener``。由此可以推断，诸如``@Configuration``的工作、Bean定义加载、Bean创建等工作等都是在后续阶段进行的。
 
@@ -41,7 +41,7 @@ public class SampleApplication {
 
 ### 准备Environment
 
-``SpringApplication#run(args)``[#L297][SpringApplicationL297]，[#L307][SpringApplicationL307]，[#L329][SpringApplicationL329]准备[ConfigurableEnvironment][ConfigurableEnvironment]。
+``SpringApplication#run(args)``[#L297][SpringApplicationL297]->[#L307][SpringApplicationL307]->``SpringApplication#prepareEnvironment(...)``[#L329][SpringApplicationL329]准备[ConfigurableEnvironment][ConfigurableEnvironment]。
 
 1. [SpringApplication#L333][SpringApplicationL333] 创建[StandardEnvironment][StandardEnvironment]（见附录）。
 1. [SpringApplication#L334][SpringApplicationL334] 配置[StandardEnvironment][StandardEnvironment]，将命令行和默认参数整吧整吧，添加到[MutablePropertySources][MutablePropertySources]。
@@ -57,17 +57,29 @@ public class SampleApplication {
 
 可以参考[官方文档][boot-features-external-config]了解[StandardEnvironment][StandardEnvironment]构建好之后，其[MutablePropertySources][MutablePropertySources]内部到底有些啥东东。
 
-### 准备ApplicationContext
+### 创建及准备ApplicationContext
 
-``SpringApplication#run(args)``[#L297][SpringApplicationL297]，[#L310][SpringApplicationL310]创建ApplicationContext（实际上创建的是[AnnotationConfigApplicationContext][AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][AnnotationConfigEmbeddedWebApplicationContext]）。
+``SpringApplication#run(args)``[#L297]
 
-然后[SpringApplication#L311][SpringApplicationL311]，[#L342][SpringApplicationL342]准备ApplicationContext
-
-TODO [
+1. [SpringApplication#L310][SpringApplicationL310]->``SpringApplication#createApplicationContext()``[#L581][SpringApplicationL581]创建ApplicationContext，可以看到实际上创建的是[AnnotationConfigApplicationContext][AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][AnnotationConfigEmbeddedWebApplicationContext]。
+1. [SpringApplication#L311][SpringApplicationL311]->``SpringApplication#prepareContext(...)``[#L342][SpringApplicationL342]准备ApplicationContext
+  1. [SpringApplication#L345][SpringApplicationL345]->``ConfigurableApplicationContext#setEnvironment``，把之前准备好的Environment塞给ApplicationContext
+  1. [SpringApplication#L346][SpringApplicationL346]->``SpringApplication#postProcessApplicationContext``[#L603][SpringApplication#L603]，给ApplicationContext设置了一些其他东西
+  1. [SpringApplication#L347][SpringApplicationL347]->``SpringApplication#applyInitializers``[#L628][SpringApplication#L628]，调用之前准备好的ApplicationContextInitializer
 
 ### 刷新ApplicationContext
 
-``SpringApplication#run(args)``[#L297][SpringApplicationL297]
+根据前面所讲，这里的ApplicationContext实际上是GenericApplicationContext->AnnotationConfigApplicationContext或者AnnotationConfigEmbeddedWebApplicationContext
+
+``SpringApplication#run(args)``[#L297][SpringApplicationL297]->[#L313][SpringApplicationL313]
+->``SpringApplication#refreshContext(context)``[#L368][SpringApplicationL368]->[#L369][SpringApplicationL369]
+->``SpringApplication#refresh(context)``[#L757][SpringApplicationL757]->[#L759][SpringApplicationL759]
+->``AbstractApplicationContext#refresh``[AbstractApplicationContext#L507][AbstractApplicationContext#L507]
+
+1. [AbstractApplicationContext#L510][AbstractApplicationContext#L510]->``AbstractApplicationContext#prepareRefresh()``[#L575][AbstractApplicationContext#L575]，做了一些初始化工作，
+比如设置了当前Context的状态，初始化propertySource（其实啥都没干），检查必填的property是否都已在Environment中（其实并没有必填property可供检查）等。
+1. [AbstractApplicationContext#L513][AbstractApplicationContext#L510]->``AbstractApplicationContext#obtainFreshBeanFactory()``获得[BeanFactory][BeanFactory]，实际上这里获得的是[DefaultListableBeanFactory][DefaultListableBeanFactory]
+1. [AbstractApplicationContext#L516][AbstractApplicationContext#L516]->``prepareBeanFactory(beanFactory)``准备[BeanFactory][BeanFactory]
 
 TODO
 
@@ -188,6 +200,15 @@ TODO
   [SpringApplicationL311]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L311
   [SpringApplicationL329]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L329
   [SpringApplicationL342]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L342
+  [SpringApplicationL345]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L345
+  [SpringApplicationL346]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L346
+  [SpringApplicationL581]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L581
+  [SpringApplicationL603]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L603
+  [SpringApplicationL628]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
+  [SpringApplicationL368]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L368
+  [SpringApplicationL313]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L313
+  [SpringApplicationL369]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L369
+  [SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
   [ConfigurableEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/ConfigurableEnvironment.html
   [SpringApplication]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/SpringApplication.html
   [StandardEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/StandardEnvironment.html
@@ -205,3 +226,6 @@ TODO
   [howto-customize-the-environment-or-application-context]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#howto-customize-the-environment-or-application-context
   [AnnotationConfigApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html
   [AnnotationConfigEmbeddedWebApplicationContext]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/embedded/AnnotationConfigEmbeddedWebApplicationContext.html
+  [AbstractApplicationContext#L507][https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L507]
+  [DefaultListableBeanFactory][http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/DefaultListableBeanFactory.html]
+  [BeanFactory][http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactory.html]
