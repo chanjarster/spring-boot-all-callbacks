@@ -46,14 +46,14 @@ public class SampleApplication {
 1. [SpringApplication#L333][SpringApplicationL333] 创建[StandardEnvironment][StandardEnvironment]（见附录）。
 1. [SpringApplication#L334][SpringApplicationL334] 配置[StandardEnvironment][StandardEnvironment]，将命令行和默认参数整吧整吧，添加到[MutablePropertySources][MutablePropertySources]。
 1. [SpringApplication#L335][SpringApplicationL335] 推送``ApplicationEnvironmentPreparedEvent``给所有的``ApplicationListener``（见附录）。下面是关心此事件的listener:
-  1. BackgroundPreinitializer
-  1. FileEncodingApplicationListener
-  1. AnsiOutputApplicationListener
+  1. [BackgroundPreinitializer][BackgroundPreinitializer]
+  1. [FileEncodingApplicationListener][FileEncodingApplicationListener]
+  1. [AnsiOutputApplicationListener][AnsiOutputApplicationListener]
   1. [ConfigFileApplicationListener][ConfigFileApplicationListener]（见附录）
-  1. DelegatingApplicationListener
-  1. ClasspathLoggingApplicationListener
+  1. [DelegatingApplicationListener][DelegatingApplicationListener]
+  1. [ClasspathLoggingApplicationListener][ClasspathLoggingApplicationListener]
   1. [LoggingApplicationListener][LoggingApplicationListener]
-  1. ApplicationPidFileWriter
+  1. [ApplicationPidFileWriter][ApplicationPidFileWriter]
 
 可以参考[官方文档][boot-features-external-config]了解[StandardEnvironment][StandardEnvironment]构建好之后，其[MutablePropertySources][MutablePropertySources]内部到底有些啥东东。
 
@@ -102,10 +102,10 @@ TODO
 
 已知清单1：spring-boot-1.4.0.RELEASE.jar!/META-INF/spring.factories
 
-1. org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer（优先级：0）
-1. org.springframework.boot.context.ContextIdApplicationContextInitializer（优先级：Ordered.LOWEST_PRECEDENCE - 10）
-1. org.springframework.boot.context.config.DelegatingApplicationContextInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
-1. org.springframework.boot.context.web.ServerPortInfoApplicationContextInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. [ConfigurationWarningsApplicationContextInitializer][ConfigurationWarningsApplicationContextInitializer]（优先级：0）
+1. [ContextIdApplicationContextInitializer][ContextIdApplicationContextInitializer]（优先级：Ordered.LOWEST_PRECEDENCE - 10）
+1. [DelegatingApplicationContextInitializer][DelegatingApplicationContextInitializer]（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. [ServerPortInfoApplicationContextInitializer][ServerPortInfoApplicationContextInitializer]（优先级：无=Ordered.LOWEST_PRECEDENCE）
 
 已知清单2：spring-boot-autoconfigure-1.4.0.RELEASE.jar!/META-INF/spring.factories
 
@@ -122,20 +122,20 @@ TODO
 
 已知清单1：spring-boot-1.4.0.RELEASE.jar!/META-INF/spring.factories中定义的
 
-1. org.springframework.boot.ClearCachesApplicationListener（优先级：无=Ordered.LOWEST_PRECEDENCE）
-1. org.springframework.boot.builder.ParentContextCloserApplicationListener（优先级：Ordered.LOWEST_PRECEDENCE - 10）
-1. org.springframework.boot.context.FileEncodingApplicationListener（优先级：Ordered.LOWEST_PRECEDENCE）
-1. org.springframework.boot.context.config.AnsiOutputApplicationListener（优先级：ConfigFileApplicationListener.DEFAULT_ORDER + 1）
-1. org.springframework.boot.context.config.ConfigFileApplicationListener（优先级：Ordered.HIGHEST_PRECEDENCE + 10）
-1. org.springframework.boot.context.config.DelegatingApplicationListener（优先级：0)
-1. org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener（优先级：无=Ordered.LOWEST_PRECEDENCE）
-1. org.springframework.boot.logging.ClasspathLoggingApplicationListener（优先级：LoggingApplicationListener的优先级 + 1）
-1. org.springframework.boot.logging.LoggingApplicationListener（优先级：Ordered.HIGHEST_PRECEDENCE + 20）
+1. [ClearCachesApplicationListener][ClearCachesApplicationListener]（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. [ParentContextCloserApplicationListener][ParentContextCloserApplicationListener]（优先级：Ordered.LOWEST_PRECEDENCE - 10）
+1. [FileEncodingApplicationListener][FileEncodingApplicationListener]（优先级：Ordered.LOWEST_PRECEDENCE）
+1. [AnsiOutputApplicationListener][AnsiOutputApplicationListener]（优先级：ConfigFileApplicationListener.DEFAULT_ORDER + 1）
+1. [ConfigFileApplicationListener][ConfigFileApplicationListener]（优先级：Ordered.HIGHEST_PRECEDENCE + 10）
+1. [DelegatingApplicationListener][DelegatingApplicationListener]（优先级：0)
+1. [LiquibaseServiceLocatorApplicationListener][LiquibaseServiceLocatorApplicationListener]（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. [ClasspathLoggingApplicationListener][ClasspathLoggingApplicationListener]（优先级：LoggingApplicationListener的优先级 + 1）
+1. [LoggingApplicationListener][LoggingApplicationListener]（优先级：Ordered.HIGHEST_PRECEDENCE + 20）
 
 
 已知清单2：spring-boot-autoconfigure-1.4.0.RELEASE.jar!/META-INF/spring.factories中定义的
 
-1. org.springframework.boot.autoconfigure.BackgroundPreinitializer
+1. [BackgroundPreinitializer][BackgroundPreinitializer]
 
 ### SpringApplicationRunListener
 
@@ -159,8 +159,8 @@ TODO
 
 已知清单：spring-boot-1.4.0.RELEASE.jar!/META-INF/spring.factories定义的
 
-1. org.springframework.boot.cloud.CloudFoundryVcapEnvironmentPostProcessor（优先级：ConfigFileApplicationListener.DEFAULT_ORDER - 1）
-1. org.springframework.boot.env.SpringApplicationJsonEnvironmentPostProcessor（优先级：Ordered.HIGHEST_PRECEDENCE + 5）
+1. [CloudFoundryVcapEnvironmentPostProcessor][CloudFoundryVcapEnvironmentPostProcessor]（优先级：ConfigFileApplicationListener.DEFAULT_ORDER - 1）
+1. [SpringApplicationJsonEnvironmentPostProcessor][SpringApplicationJsonEnvironmentPostProcessor]（优先级：Ordered.HIGHEST_PRECEDENCE + 5）
 
 
 ## 内置类说明
@@ -181,7 +181,6 @@ TODO
 
 
 
-  [AnnotationAwareOrderComparator]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/annotation/AnnotationAwareOrderComparator.html
   [SpringApplicationL1173]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1173
   [SpringApplicationL1185]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1185
   [SpringApplicationL236]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L236
@@ -209,12 +208,15 @@ TODO
   [SpringApplicationL313]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L313
   [SpringApplicationL369]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L369
   [SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
+  [AbstractApplicationContext#L507]: [https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L507]
+  [AbstractApplicationContext#L510]: [https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L510]
+  [AbstractApplicationContext#L575]: [https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L575]
   [ConfigurableEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/ConfigurableEnvironment.html
+  [AnnotationAwareOrderComparator]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/annotation/AnnotationAwareOrderComparator.html
   [SpringApplication]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/SpringApplication.html
   [StandardEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/StandardEnvironment.html
   [MutablePropertySources]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/MutablePropertySources.html
   [PropertySource]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/PropertySource.html
-  [ConfigFileApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/ConfigFileApplicationListener.html
   [boot-features-external-config]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-external-config
   [ApplicationContextInitializer]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContextInitializer.html
   [ApplicationListener]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationListener.html
@@ -226,6 +228,21 @@ TODO
   [howto-customize-the-environment-or-application-context]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#howto-customize-the-environment-or-application-context
   [AnnotationConfigApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html
   [AnnotationConfigEmbeddedWebApplicationContext]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/embedded/AnnotationConfigEmbeddedWebApplicationContext.html
-  [AbstractApplicationContext#L507][https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L507]
-  [DefaultListableBeanFactory][http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/DefaultListableBeanFactory.html]
-  [BeanFactory][http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactory.html]
+  [DefaultListableBeanFactory]: [http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/DefaultListableBeanFactory.html]
+  [BeanFactory]: [http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactory.html]
+  [CloudFoundryVcapEnvironmentPostProcessor]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/cloud/CloudFoundryVcapEnvironmentPostProcessor.html]
+  [SpringApplicationJsonEnvironmentPostProcessor]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/env/SpringApplicationJsonEnvironmentPostProcessor.html]
+  [ClasspathLoggingApplicationListener]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/logging/ClasspathLoggingApplicationListener.html]
+  [LiquibaseServiceLocatorApplicationListener]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/liquibase/LiquibaseServiceLocatorApplicationListener.html]
+  [DelegatingApplicationListener]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/DelegatingApplicationListener.html]
+  [ApplicationPidFileWriter]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/system/ApplicationPidFileWriter.html]
+  [AnsiOutputApplicationListener]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/AnsiOutputApplicationListener.html]
+  [ConfigFileApplicationListener]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/ConfigFileApplicationListener.html]
+  [FileEncodingApplicationListener]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/FileEncodingApplicationListener.html]
+  [ParentContextCloserApplicationListener]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/builder/ParentContextCloserApplicationListener.html]
+  [ClearCachesApplicationListener]: [https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/ClearCachesApplicationListener.java]
+  [ConfigurationWarningsApplicationContextInitializer]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/ConfigurationWarningsApplicationContextInitializer.html]
+  [ContextIdApplicationContextInitializer]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/ContextIdApplicationContextInitializer.html]
+  [DelegatingApplicationContextInitializer]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/DelegatingApplicationContextInitializer.html]
+  [ServerPortInfoApplicationContextInitializer]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/web/ServerPortInfoApplicationContextInitializer.html]
+  [BackgroundPreinitializer]: [http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/BackgroundPreinitializer.html]
