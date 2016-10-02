@@ -1,5 +1,7 @@
 # spring-boot-all-callbacks
 
+相关代码在：https://github.com/chanjarster/spring-boot-all-callbacks
+
 注：本文基于spring-boot 1.4.0.RELEASE, spring 4.3.2.RELEASE撰写。
 
 ## 启动顺序
@@ -33,7 +35,7 @@ public class SampleApplication {
 ``SpringApplication#run(args)``[#L297][SpringApplicationL297]
 
 1. [SpringApplication#L302][SpringApplicationL302] 初始化``SpringApplicationRunListeners``（见附录）。它内部只包含``org.springframework.boot.context.event.EventPublishingRunListener``。
-1. [SpringApplication#L303][SpringApplicationL303] 推送``ApplicationStartedEvent``给所有的``SpringApplication#listeners``。 下面是关心此事件的listener：
+1. [SpringApplication#L303][SpringApplicationL303] 推送``ApplicationStartedEvent``给所有的``ApplicationListener``（见附录）。 下面是关心此事件的listener：
     1. LiquibaseServiceLocatorApplicationListener
     1. [LoggingApplicationListener][LoggingApplicationListener]（见附录）
 
@@ -43,7 +45,7 @@ public class SampleApplication {
 
 1. [SpringApplication#L333][SpringApplicationL333] 创建[StandardEnvironment][StandardEnvironment]（见附录）。
 1. [SpringApplication#L334][SpringApplicationL334] 配置[StandardEnvironment][StandardEnvironment]，将命令行和默认参数整吧整吧，添加到[MutablePropertySources][MutablePropertySources]。
-1. [SpringApplication#L335][SpringApplicationL335] 推送``ApplicationEnvironmentPreparedEvent``给所有的``SpringApplication#listeners``。下面是关心此事件的listener:
+1. [SpringApplication#L335][SpringApplicationL335] 推送``ApplicationEnvironmentPreparedEvent``给所有的``ApplicationListener``（见附录）。下面是关心此事件的listener:
   1. BackgroundPreinitializer
   1. FileEncodingApplicationListener
   1. AnsiOutputApplicationListener
@@ -61,7 +63,7 @@ public class SampleApplication {
 
 然后[SpringApplication#L311][SpringApplicationL311]，[#L342][SpringApplicationL342]准备ApplicationContext
 
-TODO
+TODO [
 
 ### 刷新ApplicationContext
 
@@ -88,16 +90,15 @@ TODO
 
 已知清单1：spring-boot-1.4.0.RELEASE.jar!/META-INF/spring.factories
 
-1. org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer
-1. org.springframework.boot.context.ContextIdApplicationContextInitializer
-1. org.springframework.boot.context.config.DelegatingApplicationContextInitializer
-1. org.springframework.boot.context.web.ServerPortInfoApplicationContextInitializer
+1. org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer（优先级：0）
+1. org.springframework.boot.context.ContextIdApplicationContextInitializer（优先级：Ordered.LOWEST_PRECEDENCE - 10）
+1. org.springframework.boot.context.config.DelegatingApplicationContextInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. org.springframework.boot.context.web.ServerPortInfoApplicationContextInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
 
 已知清单2：spring-boot-autoconfigure-1.4.0.RELEASE.jar!/META-INF/spring.factories
 
-1. org.springframework.boot.autoconfigure.SharedMetadataReaderFactoryContextInitializer
-1. org.springframework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer
-
+1. org.springframework.boot.autoconfigure.SharedMetadataReaderFactoryContextInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. org.springframework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
 
 ### ApplicationListener
 
@@ -109,15 +110,15 @@ TODO
 
 已知清单1：spring-boot-1.4.0.RELEASE.jar!/META-INF/spring.factories中定义的
 
-1. org.springframework.boot.ClearCachesApplicationListener
-1. org.springframework.boot.builder.ParentContextCloserApplicationListener
-1. org.springframework.boot.context.FileEncodingApplicationListener
-1. org.springframework.boot.context.config.AnsiOutputApplicationListener
-1. org.springframework.boot.context.config.ConfigFileApplicationListener
-1. org.springframework.boot.context.config.DelegatingApplicationListener
-1. org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener
-1. org.springframework.boot.logging.ClasspathLoggingApplicationListener
-1. org.springframework.boot.logging.LoggingApplicationListener
+1. org.springframework.boot.ClearCachesApplicationListener（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. org.springframework.boot.builder.ParentContextCloserApplicationListener（优先级：Ordered.LOWEST_PRECEDENCE - 10）
+1. org.springframework.boot.context.FileEncodingApplicationListener（优先级：Ordered.LOWEST_PRECEDENCE）
+1. org.springframework.boot.context.config.AnsiOutputApplicationListener（优先级：ConfigFileApplicationListener.DEFAULT_ORDER + 1）
+1. org.springframework.boot.context.config.ConfigFileApplicationListener（优先级：Ordered.HIGHEST_PRECEDENCE + 10）
+1. org.springframework.boot.context.config.DelegatingApplicationListener（优先级：0)
+1. org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. org.springframework.boot.logging.ClasspathLoggingApplicationListener（优先级：LoggingApplicationListener的优先级 + 1）
+1. org.springframework.boot.logging.LoggingApplicationListener（优先级：Ordered.HIGHEST_PRECEDENCE + 20）
 
 
 已知清单2：spring-boot-autoconfigure-1.4.0.RELEASE.jar!/META-INF/spring.factories中定义的
@@ -134,7 +135,7 @@ TODO
 
 已知清单：spring-boot-1.4.0.RELEASE.jar!/META-INF/spring.factories定义的
 
-1. org.springframework.boot.context.event.EventPublishingRunListener
+1. org.springframework.boot.context.event.EventPublishingRunListener（优先级：0）
 
 ### EnvironmentPostProcessor
 
@@ -146,8 +147,8 @@ TODO
 
 已知清单：spring-boot-1.4.0.RELEASE.jar!/META-INF/spring.factories定义的
 
-1. org.springframework.boot.cloud.CloudFoundryVcapEnvironmentPostProcessor
-1. org.springframework.boot.env.SpringApplicationJsonEnvironmentPostProcessor
+1. org.springframework.boot.cloud.CloudFoundryVcapEnvironmentPostProcessor（优先级：ConfigFileApplicationListener.DEFAULT_ORDER - 1）
+1. org.springframework.boot.env.SpringApplicationJsonEnvironmentPostProcessor（优先级：Ordered.HIGHEST_PRECEDENCE + 5）
 
 
 ## 内置类说明

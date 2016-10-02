@@ -1,0 +1,11 @@
+org.springframework.context.ApplicationContextInitializer=\
+  me.chanjar.simple.callback.MyApplicationContextInitializer
+
+org.springframework.context.ApplicationListener=\
+  me.chanjar.simple.callback.MyApplicationListener
+
+org.springframework.boot.SpringApplicationRunListener=\
+  me.chanjar.simple.callback.MySpringApplicationRunListener
+
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  me.chanjar.simple.callback.MyEnvironmentPostProcessor

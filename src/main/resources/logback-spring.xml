@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+  <property name="CONSOLE_LOG_PATTERN_SP" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){yellow} %clr(:){yellow} %clr(%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}){yellow}"/>
+
+  <appender name="CONSOLE_SP" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN_SP}</pattern>
+      <charset>utf8</charset>
+    </encoder>
+  </appender>
+
+  <logger name="me.chanjar.simple.callback.SpringCallbackLogger" additivity="false">
+    <appender-ref ref="CONSOLE_SP" />
+  </logger>
+
+
+</configuration>
