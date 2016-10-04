@@ -68,7 +68,7 @@ public class SampleApplication {
 可以看到实际上创建的是[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]。
 1. [SpringApplication#L311][code-SpringApplicationL311]->``SpringApplication#prepareContext(...)``[#L342][code-SpringApplicationL342]准备[ApplicationContext][core-ApplicationContext]
   1. [SpringApplication#L345][code-SpringApplicationL345]->``ConfigurableApplicationContext#setEnvironment``，把之前准备好的[Environment][core-Environment]塞给[ApplicationContext][core-ApplicationContext]
-  1. [SpringApplication#L346][code-SpringApplicationL346]->``SpringApplication#postProcessApplicationContext``[#L603][SpringApplication#L603]，给[ApplicationContext][core-ApplicationContext]设置了一些其他东西
+  1. [SpringApplication#L346][code-SpringApplicationL346]->``SpringApplication#postProcessApplicationContext``[#L603][code-SpringApplication#L603]，给[ApplicationContext][core-ApplicationContext]设置了一些其他东西
   1. [SpringApplication#L347][code-SpringApplicationL347]->``SpringApplication#applyInitializers``[#L628][code-SpringApplication#L628]，调用之前准备好的[ApplicationContextInitializer][core-ApplicationContextInitializer]
   1. [SpringApplication#L364][code-SpringApplicationL364]->``SpringApplication#load``[#L685][code-SpringApplication#L685]，负责将source(复数)里所定义的Bean加入到[ApplicationContext][core-ApplicationContext]里，在本例中就是SampleApplication，这些source是在**初始化SpringApplication**阶段获得的。
   
@@ -293,15 +293,17 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 1. 再根据[@AutoConfigureOrder][boot-AutoConfigureOrder]排序，如果没有[@AutoConfigureOrder][boot-AutoConfigureOrder]则优先级最低
 1. 再根据[@AutoConfigureBefore][boot-AutoConfigureBefore],[@AutoConfigureAfter][boot-AutoConfigureAfter]排序
 
-TODO 它是如何将Auto configuration放在普通的@Configuration之前执行的？
+TODO 它是如何将Auto configuration放在普通的[@Configuration][core-Configuration]之前执行的？
 
 
-  [boot-AutoConfigureOrder]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureOrder.html
-  [boot-AutoConfigureBefore]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureBefore.html
-  [boot-AutoConfigureAfter]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureAfter.html
   [boot-AnnotationConfigEmbeddedWebApplicationContext]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/embedded/AnnotationConfigEmbeddedWebApplicationContext.html
   [boot-AnsiOutputApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/AnsiOutputApplicationListener.html
+  [boot-ApplicationEnvironmentPreparedEvent]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html
   [boot-ApplicationPidFileWriter]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/system/ApplicationPidFileWriter.html
+  [boot-ApplicationStartedEvent]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/event/ApplicationStartedEvent.html
+  [boot-AutoConfigureAfter]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureAfter.html
+  [boot-AutoConfigureBefore]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureBefore.html
+  [boot-AutoConfigureOrder]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureOrder.html
   [boot-BackgroundPreinitializer]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/BackgroundPreinitializer.html
   [boot-ClasspathLoggingApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/logging/ClasspathLoggingApplicationListener.html
   [boot-ClearCachesApplicationListener]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/ClearCachesApplicationListener.java
@@ -310,7 +312,10 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [boot-ContextIdApplicationContextInitializer]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/ContextIdApplicationContextInitializer.html
   [boot-DelegatingApplicationContextInitializer]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/DelegatingApplicationContextInitializer.html
   [boot-DelegatingApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/DelegatingApplicationListener.html
+  [boot-EnableAutoConfigurationImportSelector]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/EnableAutoConfigurationImportSelector.html
+  [boot-EnableAutoConfiguration]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/EnableAutoConfiguration.html
   [boot-EnvironmentPostProcessor]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/env/EnvironmentPostProcessor.html
+  [boot-EventPublishingRunListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/event/EventPublishingRunListener.html
   [boot-FileEncodingApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/FileEncodingApplicationListener.html
   [boot-LiquibaseServiceLocatorApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/liquibase/LiquibaseServiceLocatorApplicationListener.html
   [boot-LoggingApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/logging/LoggingApplicationListener.html
@@ -319,8 +324,7 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [boot-SpringApplicationJsonEnvironmentPostProcessor]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/env/SpringApplicationJsonEnvironmentPostProcessor.html
   [boot-SpringApplicationRunListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/SpringApplicationRunListener.html
   [boot-SpringApplication]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/SpringApplication.html
-  [boot-EnableAutoConfigurationImportSelector]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/EnableAutoConfigurationImportSelector.html
-  [boot-EnableAutoConfiguration]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/EnableAutoConfiguration.html
+  [boot-SpringBootApplication]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/SpringBootApplication.html
   [code-AbstractApplicationContext#L507]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L507
   [code-AbstractApplicationContext#L510]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L510
   [code-AbstractApplicationContext#L513]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L513
@@ -328,6 +332,26 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [code-AbstractApplicationContext#L520]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L520
   [code-AbstractApplicationContext#L523]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L523
   [code-AbstractApplicationContext#L575]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L575
+  [code-AnnotatedBeanDefinitionReader#L83]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.java#L83
+  [code-AnnotationConfigApplicationContext#L51]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigApplicationContext.java#L51
+  [code-AnnotationConfigUtils#L145]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L145
+  [code-AnnotationConfigUtils#L160]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L160
+  [code-ApplicationContextAwareProcessor]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/ApplicationContextAwareProcessor.java
+  [code-AutoConfigurationSorter]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationSorter.java
+  [code-CachingMetadataReaderFactoryPostProcessor]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L66
+  [code-ConfigFileApplicationListener#L158]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L158
+  [code-ConfigFileApplicationListener#L199]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L199
+  [code-ConfigFileApplicationListener#L244]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L244
+  [code-ConfigurationClassPostProcessor#L293]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassPostProcessor.java#L293
+  [code-ConfigurationClassPostProcessor]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassPostProcessor.java
+  [code-ConfigurationClassUtils#L122]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L122
+  [code-ConfigurationClassUtils#L209]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L209
+  [code-ConfigurationWarningsApplicationContextInitializer#L60]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/ConfigurationWarningsApplicationContextInitializer.java#L60
+  [code-PropertySourceOrderingPostProcessor]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L285
+  [code-SharedMetadataReaderFactoryContextInitializer#L57]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L57
+  [code-SharedMetadataReaderFactoryContextInitializer]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java
+  [code-SpringApplication#L603]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L603
+  [code-SpringApplication#L628]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
   [code-SpringApplicationL1173]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1173
   [code-SpringApplicationL1185]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1185
   [code-SpringApplicationL236]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L236
@@ -350,65 +374,53 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [code-SpringApplicationL345]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L345
   [code-SpringApplicationL346]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L346
   [code-SpringApplicationL347]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L347
+  [code-SpringApplicationL364]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L364
   [code-SpringApplicationL368]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L368
   [code-SpringApplicationL369]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L369
   [code-SpringApplicationL581]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L581
   [code-SpringApplicationL603]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L603
   [code-SpringApplicationL628]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
-  [code-SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
-  [code-SpringApplicationL364]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L364
   [code-SpringApplicationL685]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L685
   [code-SpringApplicationL757]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L757
-  [code-SpringApplication#L628]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
-  [code-SharedMetadataReaderFactoryContextInitializer]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java
-  [code-SharedMetadataReaderFactoryContextInitializer#L57]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L57
-  [code-ConfigurationWarningsApplicationContextInitializer#L60]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/ConfigurationWarningsApplicationContextInitializer.java#L60
-  [code-ConfigFileApplicationListener#L158]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L158
-  [code-ConfigFileApplicationListener#L199]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L199
-  [code-ConfigFileApplicationListener#L244]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L244
-  [code-AnnotationConfigUtils#L145]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L145
-  [code-AnnotationConfigUtils#L160]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L160
-  [code-AnnotationConfigApplicationContext#L51]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigApplicationContext.java#L51
-  [code-ConfigurationClassPostProcessor]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassPostProcessor.java
-  [code-ConfigurationClassPostProcessor#L293]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassPostProcessor.java#L293
-  [code-ConfigurationClassUtils#L209]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L209
-  [code-ConfigurationClassUtils#L122]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L122
-  [code-AutoConfigurationSorter]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationSorter.java
-  [code-AutoConfigurationSorter]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationSorter.java
-  [code-AnnotatedBeanDefinitionReader#L83]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.java#L83
+  [code-SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
+  [code-SpringApplicationRunListeners]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplicationRunListeners.java
+  [code-spring-4.3.2.RELEASE]: https://github.com/spring-projects/spring-framework/tree/v4.3.2.RELEASE
+  [code-spring-boot-1.4.0.RELEASE]: https://github.com/spring-projects/spring-boot/tree/v1.4.0.RELEASE 
+  [core-AnnotatedBeanDefinitionReader]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.html
   [core-AnnotationAwareOrderComparator]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/annotation/AnnotationAwareOrderComparator.html
   [core-AnnotationConfigApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html
-  [core-ApplicationContextInitializer]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContextInitializer.html
-  [core-ApplicationListener]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationListener.html
-  [core-BeanFactory]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactory.html
-  [core-CloudFoundryVcapEnvironmentPostProcessor]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/cloud/CloudFoundryVcapEnvironmentPostProcessor.html
-  [core-ConfigurableEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/ConfigurableEnvironment.html
-  [core-DefaultListableBeanFactory]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/DefaultListableBeanFactory.html
-  [core-MutablePropertySources]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/MutablePropertySources.html
-  [core-PropertySource]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/PropertySource.html
-  [core-StandardEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/StandardEnvironment.html
-  [code-ApplicationContextAwareProcessor]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/ApplicationContextAwareProcessor.java
   [core-ApplicationContextAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContextAware.html
+  [core-ApplicationContextInitializer]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContextInitializer.html
   [core-ApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContext.html
-  [core-ApplicationEventPublisher]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisher.html
   [core-ApplicationEventPublisherAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisherAware.html
-  [core-BeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/config/BeanPostProcessor.html
-  [core-EmbeddedValueResolverAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/EmbeddedValueResolverAware.html
-  [core-EnvironmentAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/EnvironmentAware.html
-  [core-MessageSourceAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/MessageSourceAware.html
-  [core-PropertyEditorRegistrar]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/PropertyEditorRegistrar.html
-  [core-ResourceLoader]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/io/ResourceLoader.html
-  [core-ResourceLoaderAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ResourceLoaderAware.html
-  [core-BeanFactoryPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/config/BeanFactoryPostProcessor.html
+  [core-ApplicationEventPublisher]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisher.html
+  [core-ApplicationListener]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationListener.html
   [core-BeanDefinitionRegistryPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/BeanDefinitionRegistryPostProcessor.html
+  [core-BeanFactoryPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/config/BeanFactoryPostProcessor.html
+  [core-BeanFactory]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactory.html
+  [core-BeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/config/BeanPostProcessor.html
+  [core-CloudFoundryVcapEnvironmentPostProcessor]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/cloud/CloudFoundryVcapEnvironmentPostProcessor.html
+  [core-Component]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/stereotype/Component.html
+  [core-ConfigurableEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/ConfigurableEnvironment.html
   [core-ConfigurationClassPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/ConfigurationClassPostProcessor.html
   [core-Configuration]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/Configuration.html
+  [core-DefaultListableBeanFactory]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/DefaultListableBeanFactory.html
+  [core-EmbeddedValueResolverAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/EmbeddedValueResolverAware.html
+  [core-EnvironmentAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/EnvironmentAware.html
+  [core-Environment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/Environment.html
+  [core-GenericApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/support/GenericApplicationContext.html
+  [core-LoadTimeWeaverAwareProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/weaving/LoadTimeWeaverAwareProcessor.html
+  [core-LoadTimeWeaverAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/weaving/LoadTimeWeaverAware.html
+  [core-MessageSourceAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/MessageSourceAware.html
+  [core-MutablePropertySources]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/MutablePropertySources.html
   [core-Order]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/annotation/Order.html
-  [core-AnnotatedBeanDefinitionReader]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.html
-  [core-Component]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/stereotype/Component.html
+  [core-PropertyEditorRegistrar]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/PropertyEditorRegistrar.html
+  [core-PropertySource]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/PropertySource.html
+  [core-ResourceLoaderAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ResourceLoaderAware.html
+  [core-ResourceLoader]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/io/ResourceLoader.html
+  [core-StandardBeanExpressionResolver]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/expression/StandardBeanExpressionResolver.html
+  [core-StandardEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/StandardEnvironment.html
   [ref-boot-features-custom-log-configuration]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-custom-log-configuration
   [ref-boot-features-external-config]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-external-config
   [ref-boot-features-logging]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-logging
   [ref-boot-howto-customize-the-environment-or-application-context]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#howto-customize-the-environment-or-application-context
-  [code-spring-boot-1.4.0.RELEASE]: https://github.com/spring-projects/spring-boot/tree/v1.4.0.RELEASE 
-  [code-spring-4.3.2.RELEASE]: https://github.com/spring-projects/spring-framework/tree/v4.3.2.RELEASE
