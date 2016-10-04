@@ -66,7 +66,7 @@ public class SampleApplication {
   1. [SpringApplication#L345][code-SpringApplicationL345]->``ConfigurableApplicationContext#setEnvironment``，把之前准备好的Environment塞给ApplicationContext
   1. [SpringApplication#L346][code-SpringApplicationL346]->``SpringApplication#postProcessApplicationContext``[#L603][SpringApplication#L603]，给ApplicationContext设置了一些其他东西
   1. [SpringApplication#L347][code-SpringApplicationL347]->``SpringApplication#applyInitializers``[#L628][SpringApplication#L628]，调用之前准备好的ApplicationContextInitializer
-  1. [SpringApplication#L364][code-SpringApplicationL364]->``SpringApplication#load``[#L685][SpringApplication#L685]，负责将启动时ApplicationContext需要的source里所定义的Bean加入到ApplicationContext里，在本例中就是SampleApplication。
+  1. [SpringApplication#L364][code-SpringApplicationL364]->``SpringApplication#load``[#L685][code-SpringApplication#L685]，负责将启动时ApplicationContext需要的source里所定义的Bean加入到ApplicationContext里，在本例中就是SampleApplication。
   
 要注意的是在这个阶段，ApplicationContext里只有SampleApplication，Bean的加载工作在后面做的，而SampleApplication是一个起点。
 
@@ -86,7 +86,7 @@ public class SampleApplication {
   1. 给BeanFactory设置了ClassLoader
   1. 给BeanFactory设置了SpEL解析器
   1. 给BeanFactory设置了[PropertyEditorRegistrar][core-PropertyEditorRegistrar]
-  1. 给BeanFactory添加了[ApplicationContextAwareProcessor][core-ApplicationContextAwareProcessor]（[BeanPostProcessor][core-BeanPostProcessor]的实现类），需要注意的是它是第一个被添加到[BeanFactory][core-BeanFactory]的[BeanPostProcessor][core-BeanPostProcessor]
+  1. 给BeanFactory添加了[ApplicationContextAwareProcessor][code-ApplicationContextAwareProcessor]（[BeanPostProcessor][core-BeanPostProcessor]的实现类），需要注意的是它是第一个被添加到[BeanFactory][core-BeanFactory]的[BeanPostProcessor][core-BeanPostProcessor]
   1. 给BeanFactory设置忽略解析以下类的依赖：[ResourceLoaderAware][core-ResourceLoaderAware]、[ApplicationEventPublisherAware][core-ApplicationEventPublisherAware]、[MessageSourceAware][core-MessageSourceAware]、[ApplicationContextAware][core-ApplicationContextAware]、[EnvironmentAware][core-EnvironmentAware]。
   原因是注入这些回调接口本身没有什么意义。
   1. 给BeanFactory添加了以下类的依赖解析：[BeanFactory][core-BeanFactory]、[ResourceLoader][core-ResourceLoader]、[ApplicationEventPublisher][core-ApplicationEventPublisher]、[ApplicationContext][core-ApplicationContext]
@@ -214,14 +214,14 @@ TODO，作用是什么，以及Spring Boot是如何在ApplicationContext里添�
 
 ### Auto Configuration
 
-所有在classpath:META-INF/spring.factories里key为org.springframework.boot.autoconfigure.EnableAutoConfiguration定义的@Configuration，比如：
+所有在classpath:META-INF/spring.factories里key为org.springframework.boot.autoconfigure.EnableAutoConfiguration定义的[@Configuration][core-Configuration]，比如：
 
 ```
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration
 ```
 
-参考附录EnableAutoConfigurationImportSelector了解Spring boot内部处理机制
+参考[EnableAutoConfiguration][boot-EnableAutoConfiguration]和附录的附录EnableAutoConfigurationImportSelector了解Spring boot内部处理机制
 
 ## 内置类说明
 
@@ -241,7 +241,7 @@ org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfig
 
 ### ApplicationContextAwareProcessor
 
-[javadoc][core-ApplicationContextAwareProcessor]
+[javadoc][code-ApplicationContextAwareProcessor]
 
 ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc这个类用来调用以下接口的回调方法：
 
@@ -283,7 +283,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 
 它用来处理Auto Configuration（见前面的附录）。
 
-它利用[AutoConfigurationSorter][boot-AutoConfigurationSorter]对Auto Configuration进行排序。逻辑算法是：
+它利用[AutoConfigurationSorter][code-AutoConfigurationSorter]对Auto Configuration进行排序。逻辑算法是：
 1. 先根据类名排序
 1. 再根据[@AutoConfigureOrder][boot-AutoConfigureOrder]排序，如果没有[@AutoConfigureOrder][boot-AutoConfigureOrder]则优先级最低
 1. 再根据[@AutoConfigureBefore][boot-AutoConfigureBefore],[@AutoConfigureAfter][boot-AutoConfigureAfter]排序
@@ -291,6 +291,9 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 TODO 它是如何将Auto configuration放在普通的@Configuration之前执行的？
 
 
+  [boot-AutoConfigureOrder]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureOrder.html
+  [boot-AutoConfigureBefore]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureBefore.html
+  [boot-AutoConfigureAfter]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/AutoConfigureAfter.html
   [boot-AnnotationConfigEmbeddedWebApplicationContext]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/embedded/AnnotationConfigEmbeddedWebApplicationContext.html
   [boot-AnsiOutputApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/AnsiOutputApplicationListener.html
   [boot-ApplicationPidFileWriter]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/system/ApplicationPidFileWriter.html
@@ -312,6 +315,7 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [boot-SpringApplicationRunListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/SpringApplicationRunListener.html
   [boot-SpringApplication]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/SpringApplication.html
   [boot-EnableAutoConfigurationImportSelector]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/EnableAutoConfigurationImportSelector.html
+  [boot-EnableAutoConfiguration]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/EnableAutoConfiguration.html
   [code-AbstractApplicationContext#L507]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L507
   [code-AbstractApplicationContext#L510]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L510
   [code-AbstractApplicationContext#L513]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L513
@@ -347,6 +351,8 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [code-SpringApplicationL603]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L603
   [code-SpringApplicationL628]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
   [code-SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
+  [code-SpringApplicationL364]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L364
+  [code-SpringApplicationL685]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L685
   [code-SharedMetadataReaderFactoryContextInitializer#L57]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L57
   [code-ConfigurationWarningsApplicationContextInitializer#L60]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/ConfigurationWarningsApplicationContextInitializer.java#L60
   [code-ConfigFileApplicationListener#L158]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L158
@@ -359,6 +365,7 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [code-ConfigurationClassUtils#L209]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L209
   [code-ConfigurationClassUtils#L122]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L122
   [code-AutoConfigurationSorter]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationSorter.java
+  [code-AutoConfigurationSorter]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationSorter.java
   [core-AnnotationAwareOrderComparator]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/annotation/AnnotationAwareOrderComparator.html
   [core-AnnotationConfigApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html
   [core-ApplicationContextInitializer]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContextInitializer.html
@@ -370,7 +377,7 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [core-MutablePropertySources]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/MutablePropertySources.html
   [core-PropertySource]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/PropertySource.html
   [core-StandardEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/StandardEnvironment.html
-  [core-ApplicationContextAwareProcessor]: TODO
+  [code-ApplicationContextAwareProcessor]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/ApplicationContextAwareProcessor.java
   [core-ApplicationContextAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContextAware.html
   [core-ApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContext.html
   [core-ApplicationEventPublisher]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisher.html
