@@ -131,7 +131,7 @@ TODO
 
 [javadoc][core-ApplicationContextInitializer] [相关文档][ref-boot-howto-customize-the-environment-or-application-context]
 
-加载方式：读取classpath*:META-INF/spring.factories中key等于org.springframework.context.ApplicationContextInitializer的property列出的类
+加载方式：读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.context.ApplicationContextInitializer``的property列出的类
 
 排序方式：[AnnotationAwareOrderComparator][core-AnnotationAwareOrderComparator]
 
@@ -145,13 +145,13 @@ TODO
 已知清单2：spring-boot-autoconfigure-1.4.0.RELEASE.jar!/META-INF/spring.factories
 
 1. [SharedMetadataReaderFactoryContextInitializer][code-SharedMetadataReaderFactoryContextInitializer]（优先级：无=Ordered.LOWEST_PRECEDENCE）
-1. org.springframework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. [AutoConfigurationReportLoggingInitializer][boot-AutoConfigurationReportLoggingInitializer]（优先级：无=Ordered.LOWEST_PRECEDENCE）
 
 ### ApplicationListener
 
 [javadoc][core-ApplicationListener] [相关文档][ref-boot-howto-customize-the-environment-or-application-context]
 
-加载方式：读取classpath*:META-INF/spring.factories中key等于org.springframework.context.ApplicationListener的property列出的类
+加载方式：读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.context.ApplicationListener``的property列出的类
 
 排序方式：[AnnotationAwareOrderComparator][core-AnnotationAwareOrderComparator]
 
@@ -175,7 +175,7 @@ TODO
 
 [javadoc][boot-SpringApplicationRunListener] 
 
-加载方式：读取classpath*:META-INF/spring.factories中key等于org.springframework.boot.SpringApplicationRunListener的property列出的类
+加载方式：读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.boot.SpringApplicationRunListener``的property列出的类
 
 排序方式：[AnnotationAwareOrderComparator][core-AnnotationAwareOrderComparator]
 
@@ -187,7 +187,7 @@ TODO
 
 [EnvironmentPostProcessor][boot-EnvironmentPostProcessor]可以用来自定义[StandardEnvironment][core-StandardEnvironment]（[相关文档][ref-boot-howto-customize-the-environment-or-application-context]）。
 
-加载方式：读取classpath*:META-INF/spring.factories中key等于org.springframework.boot.env.EnvironmentPostProcessor的property列出的类
+加载方式：读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.boot.env.EnvironmentPostProcessor``的property列出的类
 
 排序方式：[AnnotationAwareOrderComparator][core-AnnotationAwareOrderComparator]
 
@@ -230,14 +230,14 @@ TODO，作用是什么，以及Spring Boot是如何在ApplicationContext里添�
 
 ### Auto Configuration
 
-所有在classpath:META-INF/spring.factories里key为org.springframework.boot.autoconfigure.EnableAutoConfiguration定义的[@Configuration][core-Configuration]，比如：
+加载方式：读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.boot.autoconfigure.EnableAutoConfiguration``的property列出的[@Configuration][core-Configuration]，比如：
 
 ```
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration
 ```
 
-参考[EnableAutoConfiguration][boot-EnableAutoConfiguration]和附录的附录EnableAutoConfigurationImportSelector了解Spring boot内部处理机制
+参考[EnableAutoConfiguration][boot-EnableAutoConfiguration]和附录[EnableAutoConfigurationImportSelector][boot-EnableAutoConfigurationImportSelector]了解Spring boot内部处理机制
 
 ## 内置类说明
 
@@ -280,10 +280,10 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 
 ### AnnotatedBeanDefinitionReader
 
-这个类用来读取[@Configuration][core-Configuration]和[@Component][core-Component]，并将BeanDefinition注册到ApplicationContext里。
+这个类用来读取[@Configuration][core-Configuration]和[@Component][core-Component]，并将[BeanDefinition][core-BeanDefinition]注册到[ApplicationContext][core-ApplicationContext]里。
 
 它在其[构造函数][code-AnnotatedBeanDefinitionReader#L83]内调用了[AnnotationConfigUtils.registerAnnotationConfigProcessors][code-AnnotationConfigUtils#L160]，
-把注册了一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]：[ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]
+注册了一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]：[ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]
 
 ### ConfigurationClassPostProcessor
 
@@ -300,6 +300,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 它用来处理Auto Configuration（见前面的附录）。
 
 它利用[AutoConfigurationSorter][code-AutoConfigurationSorter]对Auto Configuration进行排序。逻辑算法是：
+
 1. 先根据类名排序
 1. 再根据[@AutoConfigureOrder][boot-AutoConfigureOrder]排序，如果没有[@AutoConfigureOrder][boot-AutoConfigureOrder]则优先级最低
 1. 再根据[@AutoConfigureBefore][boot-AutoConfigureBefore],[@AutoConfigureAfter][boot-AutoConfigureAfter]排序
@@ -307,6 +308,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 TODO 它是如何将Auto configuration放在普通的[@Configuration][core-Configuration]之前执行的？
 
 
+  [boot-AutoConfigurationReportLoggingInitializer]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/autoconfigure/logging/AutoConfigurationReportLoggingInitializer.html
   [boot-AnnotationConfigEmbeddedWebApplicationContext]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/embedded/AnnotationConfigEmbeddedWebApplicationContext.html
   [boot-AnsiOutputApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/config/AnsiOutputApplicationListener.html
   [boot-ApplicationEnvironmentPreparedEvent]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html
@@ -414,6 +416,7 @@ TODO 它是如何将Auto configuration放在普通的[@Configuration][core-Confi
   [core-ApplicationEventPublisherAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisherAware.html
   [core-ApplicationEventPublisher]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisher.html
   [core-ApplicationListener]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationListener.html
+  [core-BeanDefinition]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/config/BeanDefinition.html
   [core-BeanDefinitionRegistryPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/BeanDefinitionRegistryPostProcessor.html
   [core-BeanFactoryPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/config/BeanFactoryPostProcessor.html
   [core-BeanFactory]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactory.html
