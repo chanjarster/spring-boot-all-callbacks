@@ -9,3 +9,6 @@ org.springframework.boot.SpringApplicationRunListener=\
 
 org.springframework.boot.env.EnvironmentPostProcessor=\
   me.chanjar.simple.callback.MyEnvironmentPostProcessor
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  me.chanjar.simple.callback.MyAutoConfiguration

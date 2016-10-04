@@ -66,6 +66,8 @@ public class SampleApplication {
 
 1. [SpringApplication#L310][code-SpringApplicationL310]->``SpringApplication#createApplicationContext()``[#L581][code-SpringApplicationL581]创建[ApplicationContext][core-ApplicationContext]。
 可以看到实际上创建的是[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]。
+  1. 在构造[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]的时候，间接注册了一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]的Bean：[ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]。
+  经由[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader][构造函数][code-AnnotatedBeanDefinitionReader#L83]->[AnnotationConfigUtils.registerAnnotationConfigProcessors][code-AnnotationConfigUtils#L160]。
 1. [SpringApplication#L311][code-SpringApplicationL311]->``SpringApplication#prepareContext(...)``[#L342][code-SpringApplicationL342]准备[ApplicationContext][core-ApplicationContext]
   1. [SpringApplication#L345][code-SpringApplicationL345]->``context.setEnvironment(environment)``，把之前准备好的[Environment][core-Environment]塞给[ApplicationContext][core-ApplicationContext]
   1. [SpringApplication#L346][code-SpringApplicationL346]->``postProcessApplicationContext(context)``[#L603][code-SpringApplication#L603]，给[ApplicationContext][core-ApplicationContext]设置了一些其他东西
@@ -107,15 +109,18 @@ public class SampleApplication {
   1. 把``getEnvironment()``作为Bean添加到beanFactory中，Bean Name: environment
   1. 把``getEnvironment().getSystemProperties()``作为Bean添加到beanFactory中，Bean Name: systemProperties
   1. 把``getEnvironment().getSystemEnvironment()``作为Bean添加到beanFactory中，Bean Name: systemEnvironment
-1. [AbstractApplicationContext#L520][code-AbstractApplicationContext#L520]->``AbstractApplicationContext#postProcessBeanFactory(beanFactory)``，后置处理[BeanFactory][core-BeanFactory]，实际啥都没做
-1. [AbstractApplicationContext#L523][code-AbstractApplicationContext#L523]->``AbstractApplicationContext#invokeBeanFactoryPostProcessors(beanFactory)``，调用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对beanFactory做后置处理。
-目前已知的[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]有三个：
+1. [AbstractApplicationContext#L520][code-AbstractApplicationContext#L520]->``postProcessBeanFactory(beanFactory)``，后置处理[BeanFactory][core-BeanFactory]，实际啥都没做
+1. [AbstractApplicationContext#L523][code-AbstractApplicationContext#L523]->``invokeBeanFactoryPostProcessors(beanFactory)``，
+利用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对beanFactory做后置处理。目前已知的[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]有四个：
   1. [SharedMetadataReaderFactoryContextInitializer][code-SharedMetadataReaderFactoryContextInitializer]的内部类[CachingMetadataReaderFactoryPostProcessor][code-CachingMetadataReaderFactoryPostProcessor]，
   是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L57][code-SharedMetadataReaderFactoryContextInitializer#L57]
   1. [ConfigurationWarningsApplicationContextInitializer][boot-ConfigurationWarningsApplicationContextInitializer]的内部类[ConfigurationWarningsPostProcessor][code-ConfigurationWarningsApplicationContextInitializer#L75]，
   是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L60][code-ConfigurationWarningsApplicationContextInitializer#L60]
   1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类[PropertySourceOrderingPostProcessor][code-PropertySourceOrderingPostProcessor]，
   是在 **创建及准备ApplicationContext 2.6** 时添加的：[#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244]
+  1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]
+  是在 **创建及准备ApplicationContext 1.1** 时添加的
+    1. 
 1. TODO
 
 ### 推送ApplicationReadyEvent or ApplicationFailedEvent
@@ -202,31 +207,29 @@ TODO
 
 用来对Bean**实例**进行修改的勾子，根据Javadoc ApplicationContext会自动侦测到BeanPostProcessor Bean，然后将它们应用到后续创建的所有Bean上。
 
-### BeanFactoryPostProcessor
+### BeanFactoryPostProcessor和BeanDefinitionRegistryPostProcessor
 
-[javadoc][core-BeanFactoryPostProcessor]
+它们的作用这里就多讲了，看javadoc就明白了，不过要注意的是[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]是[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]的子接口。
 
-TODO，作用是什么，以及Spring Boot是如何在ApplicationContext里添加的
+在Spring的启动过程中，会先调用[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]然后再调用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]。这一点可以在 [PostProcessorRegistrationDelegate#invokeBeanFactoryPostProcessors][code-PostProcessorRegistrationDelegate#L57]中看出来
 
-### ResourceLoaderAware
 
-[javadoc][core-ResourceLoaderAware]
+### *Aware
 
-### ApplicationEventPublisherAware
- 
-[javadoc][core-ApplicationEventPublisherAware]
+*Aware是一类可以用来获得Spring对象的interface，这些interface都继承了[Aware][core-Aware]，已知的有：
 
-### MessageSourceAware
-
-[javadoc][core-MessageSourceAware]
-
-### ApplicationContextAware
-
-[javadoc][core-ApplicationContextAware]
-
-### EnvironmentAware
-
-[javadoc][core-EnvironmentAware]
+* [ApplicationEventPublisherAware][core-ApplicationEventPublisherAware]
+* [NotificationPublisherAware][core-NotificationPublisherAware]
+* [MessageSourceAware][core-MessageSourceAware]
+* [EnvironmentAware][core-EnvironmentAware]
+* [BeanFactoryAware][core-BeanFactoryAware]
+* [EmbeddedValueResolverAware][core-EmbeddedValueResolverAware]
+* [ResourceLoaderAware][core-ResourceLoaderAware]
+* [ImportAware][core-ImportAware]
+* [LoadTimeWeaverAware][core-LoadTimeWeaverAware]
+* [BeanNameAware][core-BeanNameAware]
+* [BeanClassLoaderAware][core-BeanClassLoaderAware]
+* [ApplicationContextAware][core-ApplicationContextAware]
 
 ### Auto Configuration
 
@@ -281,9 +284,6 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 ### AnnotatedBeanDefinitionReader
 
 这个类用来读取[@Configuration][core-Configuration]和[@Component][core-Component]，并将[BeanDefinition][core-BeanDefinition]注册到[ApplicationContext][core-ApplicationContext]里。
-
-它在其[构造函数][code-AnnotatedBeanDefinitionReader#L83]内调用了[AnnotationConfigUtils.registerAnnotationConfigProcessors][code-AnnotationConfigUtils#L160]，
-注册了一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]：[ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]
 
 ### ConfigurationClassPostProcessor
 
@@ -406,7 +406,9 @@ TODO 它是如何将Auto configuration放在普通的[@Configuration][core-Confi
   [code-SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
   [code-SpringApplicationRunListeners]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplicationRunListeners.java
   [code-spring-4.3.2.RELEASE]: https://github.com/spring-projects/spring-framework/tree/v4.3.2.RELEASE
-  [code-spring-boot-1.4.0.RELEASE]: https://github.com/spring-projects/spring-boot/tree/v1.4.0.RELEASE 
+  [code-spring-boot-1.4.0.RELEASE]: https://github.com/spring-projects/spring-boot/tree/v1.4.0.RELEASE
+  [code-PostProcessorRegistrationDelegate#L57]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/support/PostProcessorRegistrationDelegate.java#L57
+  [core-Aware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/Aware.html
   [core-AnnotatedBeanDefinitionReader]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.html
   [core-AnnotationAwareOrderComparator]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/annotation/AnnotationAwareOrderComparator.html
   [core-AnnotationConfigApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html
@@ -442,6 +444,12 @@ TODO 它是如何将Auto configuration放在普通的[@Configuration][core-Confi
   [core-ResourceLoader]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/io/ResourceLoader.html
   [core-StandardBeanExpressionResolver]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/expression/StandardBeanExpressionResolver.html
   [core-StandardEnvironment]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/env/StandardEnvironment.html
+  [core-NotificationPublisherAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/jmx/export/notification/NotificationPublisherAware.html
+  [core-BeanFactoryAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactoryAware.html
+  [core-ImportAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/ImportAware.html
+  [core-BeanNameAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanNameAware.html
+  [core-BeanClassLoaderAware]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/BeanClassLoaderAware.html
+  [core-BeanDefinitionRegistryPostProcessor]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/beans/factory/support/BeanDefinitionRegistryPostProcessor.html
   [ref-boot-features-custom-log-configuration]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-custom-log-configuration
   [ref-boot-features-external-config]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-external-config
   [ref-boot-features-logging]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-logging
