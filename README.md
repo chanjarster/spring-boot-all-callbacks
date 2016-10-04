@@ -2,7 +2,7 @@
 
 相关代码在：https://github.com/chanjarster/spring-boot-all-callbacks
 
-注：本文基于spring-boot 1.4.0.RELEASE, spring 4.3.2.RELEASE撰写。
+注：本文基于[spring-boot 1.4.0.RELEASE][code-spring-boot-1.4.0.RELEASE], [spring 4.3.2.RELEASE][code-spring-4.3.2.RELEASE]撰写。
 
 ## 启动顺序
 
@@ -22,21 +22,24 @@ public class SampleApplication {
 1. ``SpringApplication#run(Object source, String... args)``[#L1173][code-SpringApplicationL1173]
 1. [SpringApplication#L1185][code-SpringApplicationL1185] -> ``SpringApplication(sources)``[#L236][code-SpringApplicationL236]
   1. ``SpringApplication#initialize(Object[] sources)``[#L256][code-SpringApplicationL256] [javadoc][boot-SpringApplication]
-    1. [SpringApplication#L257][code-SpringApplicationL257] 添加source（复数），``SpringApplication``使用source来构建Bean。一般来说在``run``的时候都会把``@SpringBootApplication``标记的类放到``sources``参数里，然后由这个类出发找到Bean的定义。
-    2. [SpringApplication#L261][code-SpringApplicationL261] 初始化``ApplicationContextInitializer``列表（见附录）
-    3. [SpringApplication#L263][code-SpringApplicationL263] 初始化``ApplicationListener``列表（见附录）
+    1. [SpringApplication#L257][code-SpringApplicationL257] 添加source（复数），``SpringApplication``使用source来构建Bean。
+    一般来说在``run``的时候都会把[@SpringBootApplication][boot-SpringBootApplication]标记的类(本例中是SampleApplication)放到``sources``参数里，然后由这个类出发找到Bean的定义。
+    2. [SpringApplication#L261][code-SpringApplicationL261] 初始化[ApplicationContextInitializer][core-ApplicationContextInitializer]列表（见附录）
+    3. [SpringApplication#L263][code-SpringApplicationL263] 初始化[ApplicationListener][core-ApplicationListener]列表（见附录）
 1. [SpringApplication#L1185][code-SpringApplicationL1185] -> ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]，进入运行阶段
 
-所以在spring boot应用的初始化阶段只需要``ApplicationContextInitializer``和``ApplicationListener``。由此可以推断，诸如``@Configuration``的工作、Bean定义加载、Bean创建等工作等都是在后续阶段进行的。
+所以在spring boot应用的初始化阶段只需要[ApplicationContextInitializer][core-ApplicationContextInitializer]和[ApplicationListener][core-ApplicationListener]。
+由此可以推断，诸如``@Configuration``的工作、Bean定义加载、Bean创建等工作等都是在后续阶段进行的。
 
 
 ### 推送ApplicationStartedEvent
 
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
 
-1. [SpringApplication#L302][code-SpringApplicationL302] 初始化``SpringApplicationRunListeners``（见附录）。它内部只包含``org.springframework.boot.context.event.EventPublishingRunListener``。
-1. [SpringApplication#L303][code-SpringApplicationL303] 推送``ApplicationStartedEvent``给所有的``ApplicationListener``（见附录）。 下面是关心此事件的listener：
-    1. LiquibaseServiceLocatorApplicationListener
+1. [SpringApplication#L302][code-SpringApplicationL302] 初始化[SpringApplicationRunListeners][code-SpringApplicationRunListeners]([SpringApplicationRunListener][boot-SpringApplicationRunListener]的集合)。
+它内部只包含[EventPublishingRunListener][boot-EventPublishingRunListener]。
+1. [SpringApplication#L303][code-SpringApplicationL303] 推送[ApplicationStartedEvent][boot-ApplicationStartedEvent]给所有的[ApplicationListener][core-ApplicationListener]（见附录）。 下面是关心此事件的listener：
+    1. [LiquibaseServiceLocatorApplicationListener][boot-LiquibaseServiceLocatorApplicationListener]
     1. [LoggingApplicationListener][boot-LoggingApplicationListener]（见附录）
 
 ### 准备Environment
@@ -45,7 +48,7 @@ public class SampleApplication {
 
 1. [SpringApplication#L333][code-SpringApplicationL333] 创建[StandardEnvironment][core-StandardEnvironment]（见附录）。
 1. [SpringApplication#L334][code-SpringApplicationL334] 配置[StandardEnvironment][core-StandardEnvironment]，将命令行和默认参数整吧整吧，添加到[MutablePropertySources][core-MutablePropertySources]。
-1. [SpringApplication#L335][code-SpringApplicationL335] 推送``ApplicationEnvironmentPreparedEvent``给所有的``ApplicationListener``（见附录）。下面是关心此事件的listener:
+1. [SpringApplication#L335][code-SpringApplicationL335] 推送[ApplicationEnvironmentPreparedEvent][boot-ApplicationEnvironmentPreparedEvent]给所有的[ApplicationListener][core-ApplicationListener]（见附录）。下面是关心此事件的listener:
   1. [BackgroundPreinitializer][boot-BackgroundPreinitializer]
   1. [FileEncodingApplicationListener][boot-FileEncodingApplicationListener]
   1. [AnsiOutputApplicationListener][boot-AnsiOutputApplicationListener]
@@ -61,18 +64,20 @@ public class SampleApplication {
 
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
 
-1. [SpringApplication#L310][code-SpringApplicationL310]->``SpringApplication#createApplicationContext()``[#L581][code-SpringApplicationL581]创建ApplicationContext，可以看到实际上创建的是[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]。
-1. [SpringApplication#L311][code-SpringApplicationL311]->``SpringApplication#prepareContext(...)``[#L342][code-SpringApplicationL342]准备ApplicationContext
-  1. [SpringApplication#L345][code-SpringApplicationL345]->``ConfigurableApplicationContext#setEnvironment``，把之前准备好的Environment塞给ApplicationContext
-  1. [SpringApplication#L346][code-SpringApplicationL346]->``SpringApplication#postProcessApplicationContext``[#L603][SpringApplication#L603]，给ApplicationContext设置了一些其他东西
-  1. [SpringApplication#L347][code-SpringApplicationL347]->``SpringApplication#applyInitializers``[#L628][SpringApplication#L628]，调用之前准备好的ApplicationContextInitializer
-  1. [SpringApplication#L364][code-SpringApplicationL364]->``SpringApplication#load``[#L685][code-SpringApplication#L685]，负责将启动时ApplicationContext需要的source里所定义的Bean加入到ApplicationContext里，在本例中就是SampleApplication。
+1. [SpringApplication#L310][code-SpringApplicationL310]->``SpringApplication#createApplicationContext()``[#L581][code-SpringApplicationL581]创建[ApplicationContext][core-ApplicationContext]。
+可以看到实际上创建的是[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]。
+1. [SpringApplication#L311][code-SpringApplicationL311]->``SpringApplication#prepareContext(...)``[#L342][code-SpringApplicationL342]准备[ApplicationContext][core-ApplicationContext]
+  1. [SpringApplication#L345][code-SpringApplicationL345]->``ConfigurableApplicationContext#setEnvironment``，把之前准备好的[Environment][core-Environment]塞给[ApplicationContext][core-ApplicationContext]
+  1. [SpringApplication#L346][code-SpringApplicationL346]->``SpringApplication#postProcessApplicationContext``[#L603][SpringApplication#L603]，给[ApplicationContext][core-ApplicationContext]设置了一些其他东西
+  1. [SpringApplication#L347][code-SpringApplicationL347]->``SpringApplication#applyInitializers``[#L628][code-SpringApplication#L628]，调用之前准备好的[ApplicationContextInitializer][core-ApplicationContextInitializer]
+  1. [SpringApplication#L364][code-SpringApplicationL364]->``SpringApplication#load``[#L685][code-SpringApplication#L685]，负责将source(复数)里所定义的Bean加入到[ApplicationContext][core-ApplicationContext]里，在本例中就是SampleApplication，这些source是在**初始化SpringApplication**阶段获得的。
   
-要注意的是在这个阶段，ApplicationContext里只有SampleApplication，Bean的加载工作在后面做的，而SampleApplication是一个起点。
+要注意的是在这个阶段，[ApplicationContext][core-ApplicationContext]里只有SampleApplication，SampleApplication是Bean的加载工作的起点。
 
 ### 刷新ApplicationContext
 
-根据前面所讲，这里的ApplicationContext实际上是GenericApplicationContext->AnnotationConfigApplicationContext或者AnnotationConfigEmbeddedWebApplicationContext
+根据前面所讲，这里的[ApplicationContext][core-ApplicationContext]实际上是[GenericApplicationContext][core-GenericApplicationContext]
+->[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或者[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]
 
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]->[#L313][code-SpringApplicationL313]
 ->``SpringApplication#refreshContext(context)``[#L368][code-SpringApplicationL368]->[#L369][code-SpringApplicationL369]
@@ -80,26 +85,26 @@ public class SampleApplication {
 ->``AbstractApplicationContext#refresh``[AbstractApplicationContext#L507][code-AbstractApplicationContext#L507]
 
 1. [AbstractApplicationContext#L510][code-AbstractApplicationContext#L510]->``AbstractApplicationContext#prepareRefresh()``[#L575][code-AbstractApplicationContext#L575]，做了一些初始化工作，
-比如设置了当前Context的状态，初始化propertySource（其实啥都没干），检查必填的property是否都已在Environment中（其实并没有必填property可供检查）等。
+比如设置了当前Context的状态，初始化propertySource（其实啥都没干），检查required的property是否都已在Environment中（其实并没有required的property可供检查）等。
 1. [AbstractApplicationContext#L513][code-AbstractApplicationContext#L513]->``AbstractApplicationContext#obtainFreshBeanFactory()``，获得[BeanFactory][core-BeanFactory]，实际上这里获得的是[DefaultListableBeanFactory][core-DefaultListableBeanFactory]
 1. [AbstractApplicationContext#L516][code-AbstractApplicationContext#L516]->``AbstractApplicationContext#prepareBeanFactory(beanFactory)``准备[BeanFactory][core-BeanFactory]
-  1. 给BeanFactory设置了ClassLoader
-  1. 给BeanFactory设置了SpEL解析器
-  1. 给BeanFactory设置了[PropertyEditorRegistrar][core-PropertyEditorRegistrar]
-  1. 给BeanFactory添加了[ApplicationContextAwareProcessor][code-ApplicationContextAwareProcessor]（[BeanPostProcessor][core-BeanPostProcessor]的实现类），需要注意的是它是第一个被添加到[BeanFactory][core-BeanFactory]的[BeanPostProcessor][core-BeanPostProcessor]
-  1. 给BeanFactory设置忽略解析以下类的依赖：[ResourceLoaderAware][core-ResourceLoaderAware]、[ApplicationEventPublisherAware][core-ApplicationEventPublisherAware]、[MessageSourceAware][core-MessageSourceAware]、[ApplicationContextAware][core-ApplicationContextAware]、[EnvironmentAware][core-EnvironmentAware]。
+  1. 给beanFactory设置了ClassLoader
+  1. 给beanFactory设置了[SpEL解析器][core-StandardBeanExpressionResolver]
+  1. 给beanFactory设置了[PropertyEditorRegistrar][core-PropertyEditorRegistrar]
+  1. 给beanFactory添加了[ApplicationContextAwareProcessor][code-ApplicationContextAwareProcessor]（[BeanPostProcessor][core-BeanPostProcessor]的实现类），需要注意的是它是第一个被添加到[BeanFactory][core-BeanFactory]的[BeanPostProcessor][core-BeanPostProcessor]
+  1. 给beanFactory设置忽略解析以下类的依赖：[ResourceLoaderAware][core-ResourceLoaderAware]、[ApplicationEventPublisherAware][core-ApplicationEventPublisherAware]、[MessageSourceAware][core-MessageSourceAware]、[ApplicationContextAware][core-ApplicationContextAware]、[EnvironmentAware][core-EnvironmentAware]。
   原因是注入这些回调接口本身没有什么意义。
-  1. 给BeanFactory添加了以下类的依赖解析：[BeanFactory][core-BeanFactory]、[ResourceLoader][core-ResourceLoader]、[ApplicationEventPublisher][core-ApplicationEventPublisher]、[ApplicationContext][core-ApplicationContext]
-  1. 给BeanFactory添加LoadTimeWeaverAwareProcessor用来处理LoadTimeWeaverAware的回调，在和AspectJ集成的时候会用到
-  1. 把``AbstractApplicationContext.getEnvironment()``作为Bean添加到BeanFactory中，Bean Name: environment
-  1. 把``AbstractApplicationContext.getEnvironment().getSystemProperties()``作为Bean添加到BeanFactory中，Bean Name: systemProperties
-  1. 把``AbstractApplicationContext.getEnvironment().getSystemEnvironment()``作为Bean添加到BeanFactory中，Bean Name: systemEnvironment
-1. [AbstractApplicationContext#L520][code-AbstractApplicationContext#L520]->``AbstractApplicationContext#postProcessBeanFactory(beanFactory)``，后置处理[BeanFactory][core-BeanFactory]，实际啥啥都没做
-1. [AbstractApplicationContext#L523][code-AbstractApplicationContext#L523]->``AbstractApplicationContext#invokeBeanFactoryPostProcessors(beanFactory)``，调用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对BeanFactory做后置处理。
+  1. 给beanFactory添加了以下类的依赖解析：[BeanFactory][core-BeanFactory]、[ResourceLoader][core-ResourceLoader]、[ApplicationEventPublisher][core-ApplicationEventPublisher]、[ApplicationContext][core-ApplicationContext]
+  1. 给beanFactory添加[LoadTimeWeaverAwareProcessor][core-LoadTimeWeaverAwareProcessor]用来处理[LoadTimeWeaverAware][core-LoadTimeWeaverAware]的回调，在和AspectJ集成的时候会用到
+  1. 把``AbstractApplicationContext.getEnvironment()``作为Bean添加到beanFactory中，Bean Name: environment
+  1. 把``AbstractApplicationContext.getEnvironment().getSystemProperties()``作为Bean添加到beanFactory中，Bean Name: systemProperties
+  1. 把``AbstractApplicationContext.getEnvironment().getSystemEnvironment()``作为Bean添加到beanFactory中，Bean Name: systemEnvironment
+1. [AbstractApplicationContext#L520][code-AbstractApplicationContext#L520]->``AbstractApplicationContext#postProcessBeanFactory(beanFactory)``，后置处理[BeanFactory][core-BeanFactory]，实际啥都没做
+1. [AbstractApplicationContext#L523][code-AbstractApplicationContext#L523]->``AbstractApplicationContext#invokeBeanFactoryPostProcessors(beanFactory)``，调用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对beanFactory做后置处理。
 目前已知的[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]有三个：
-  1. [SharedMetadataReaderFactoryContextInitializer][boot-SharedMetadataReaderFactoryContextInitializer]的内部类CachingMetadataReaderFactoryPostProcessor，在 [#L57][code-SharedMetadataReaderFactoryContextInitializer#L57] 添加的
+  1. [SharedMetadataReaderFactoryContextInitializer][code-SharedMetadataReaderFactoryContextInitializer]的内部类[CachingMetadataReaderFactoryPostProcessor][code-CachingMetadataReaderFactoryPostProcessor]，在 [#L57][code-SharedMetadataReaderFactoryContextInitializer#L57] 添加的
   1. [ConfigurationWarningsApplicationContextInitializer][boot-ConfigurationWarningsApplicationContextInitializer]的内部类ConfigurationWarningsPostProcessor，在 [#L60][code-ConfigurationWarningsApplicationContextInitializer#L60] 添加的
-  1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类PropertySourceOrderingPostProcessor，在 [#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244] 添加的
+  1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类[PropertySourceOrderingPostProcessor][code-PropertySourceOrderingPostProcessor]，在 [#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244] 添加的
 1. TODO
 
 ### 推送ApplicationReadyEvent or ApplicationFailedEvent
@@ -128,7 +133,7 @@ TODO
 
 已知清单2：spring-boot-autoconfigure-1.4.0.RELEASE.jar!/META-INF/spring.factories
 
-1. org.springframework.boot.autoconfigure.SharedMetadataReaderFactoryContextInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
+1. [SharedMetadataReaderFactoryContextInitializer][code-SharedMetadataReaderFactoryContextInitializer]（优先级：无=Ordered.LOWEST_PRECEDENCE）
 1. org.springframework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer（优先级：无=Ordered.LOWEST_PRECEDENCE）
 
 ### ApplicationListener
@@ -273,9 +278,9 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 
 负责处理[@Configuration][core-Configuration]，具体细节不讲了，大家可以具体看[代码][code-ConfigurationClassPostProcessor]。
 
-不过有一点需要注意，就是它对[@Configuration][core-Configuration]的排序，看[#L293][code-ConfigurationClassPostProcessor#L293]->[ConfigurationClassUtils#L209][code-ConfigurationClassUtils#L209]。而order的值则是在[ConfigurationClassUtils#L122][code-ConfigurationClassUtils#L122]给的。
+不过有一点需要注意，就是它对[@Configuration][core-Configuration]的排序，看[#L293][code-ConfigurationClassPostProcessor#L293]->[ConfigurationClassUtils#L209][code-ConfigurationClassUtils#L209]。而order的值则是在[ConfigurationClassUtils#L122][code-ConfigurationClassUtils#L122]从注解中提取的。
 
-如果懒得看则直接看这个结论：[@Configuration][core-Configuration]的排序根据且只根据[@Order][code-Order]排序，如果没有[@Order][code-Order]则优先级最低。
+如果懒得看则直接看这个结论：[@Configuration][core-Configuration]的排序根据且只根据[@Order][core-Order]排序，如果没有[@Order][core-Order]则优先级最低。
 
 ### EnableAutoConfigurationImportSelector
 
@@ -353,6 +358,9 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [code-SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
   [code-SpringApplicationL364]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L364
   [code-SpringApplicationL685]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L685
+  [code-SpringApplicationL757]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L757
+  [code-SpringApplication#L628]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
+  [code-SharedMetadataReaderFactoryContextInitializer]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java
   [code-SharedMetadataReaderFactoryContextInitializer#L57]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L57
   [code-ConfigurationWarningsApplicationContextInitializer#L60]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/ConfigurationWarningsApplicationContextInitializer.java#L60
   [code-ConfigFileApplicationListener#L158]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L158
@@ -362,10 +370,12 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [code-AnnotationConfigUtils#L160]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L160
   [code-AnnotationConfigApplicationContext#L51]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigApplicationContext.java#L51
   [code-ConfigurationClassPostProcessor]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassPostProcessor.java
+  [code-ConfigurationClassPostProcessor#L293]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassPostProcessor.java#L293
   [code-ConfigurationClassUtils#L209]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L209
   [code-ConfigurationClassUtils#L122]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/ConfigurationClassUtils.java#L122
   [code-AutoConfigurationSorter]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationSorter.java
   [code-AutoConfigurationSorter]: https://github.com/spring-projects/spring-boot/blob/v1.4.0.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationSorter.java
+  [code-AnnotatedBeanDefinitionReader#L83]: https://github.com/spring-projects/spring-framework/blob/v4.3.2.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.java#L83
   [core-AnnotationAwareOrderComparator]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/core/annotation/AnnotationAwareOrderComparator.html
   [core-AnnotationConfigApplicationContext]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html
   [core-ApplicationContextInitializer]: http://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/org/springframework/context/ApplicationContextInitializer.html
@@ -400,3 +410,5 @@ TODO 它是如何将Auto configuration放在普通的@Configuration之前执行�
   [ref-boot-features-external-config]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-external-config
   [ref-boot-features-logging]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#boot-features-logging
   [ref-boot-howto-customize-the-environment-or-application-context]: http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#howto-customize-the-environment-or-application-context
+  [code-spring-boot-1.4.0.RELEASE]: https://github.com/spring-projects/spring-boot/tree/v1.4.0.RELEASE 
+  [code-spring-4.3.2.RELEASE]: https://github.com/spring-projects/spring-framework/tree/v4.3.2.RELEASE
