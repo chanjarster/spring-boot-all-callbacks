@@ -305,6 +305,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 1. 再根据[@AutoConfigureOrder][boot-AutoConfigureOrder]排序，如果没有[@AutoConfigureOrder][boot-AutoConfigureOrder]则优先级最低
 1. 再根据[@AutoConfigureBefore][boot-AutoConfigureBefore],[@AutoConfigureAfter][boot-AutoConfigureAfter]排序
 
+
 TODO 它是如何将Auto configuration放在普通的[@Configuration][core-Configuration]之前执行的？
 
 
