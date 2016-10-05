@@ -118,7 +118,7 @@ public class SampleApplication {
   是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L60][code-ConfigurationWarningsApplicationContextInitializer#L60]
   1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类[PropertySourceOrderingPostProcessor][code-PropertySourceOrderingPostProcessor]，
   是在 **创建及准备ApplicationContext 2.6** 时添加的：[#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244]
-  1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]，负责读取[BeanDefinition][core-负责读取BeanDefinition]
+  1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]，负责读取[BeanDefinition][core-BeanDefinition]
   是在 **创建及准备ApplicationContext 1.1** 时添加的
 1. 
 
