@@ -210,7 +210,7 @@ TODO
 
 [相关文档][ref-beans-factory-extension-factory-postprocessors]
 
-[PostProcessorRegistrationDelegate#L57][code-PostProcessorRegistrationDelegate#L57]负责调用[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]和[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]。
+[PostProcessorRegistrationDelegate][code-PostProcessorRegistrationDelegate#L57]负责调用[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]和[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]。
 [BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]在[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]之前被调用。
 
 
