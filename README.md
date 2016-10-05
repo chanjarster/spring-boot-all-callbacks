@@ -260,7 +260,7 @@ TODO
 
 [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]是一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]，负责处理[@Configuration][core-Configuration]。
 
-需要注意一个烟雾弹：看[#L296][code-ConfigurationClassPostProcessor#L293]->[ConfigurationClassUtils#L209][code-ConfigurationClassUtils#L209]。而order的值则是在[ConfigurationClassUtils#L122][code-ConfigurationClassUtils#L122]从注解中提取的。
+需要注意一个烟雾弹：看[#L296][code-ConfigurationClassPostProcessor#L296]->[ConfigurationClassUtils#L209][code-ConfigurationClassUtils#L209]。而order的值则是在[ConfigurationClassUtils#L122][code-ConfigurationClassUtils#L122]从注解中提取的。
 这段代码似乎告诉我们它会对[@Configuration][core-Configuration]进行排序，然后按次序加载。
 实际上不是的，[@Configuration][core-Configuration]是一个递归加载的过程。在本例中，是先从SampleApplication开始加载的，而事实上在这个时候，也就只有SampleApplication它自己可以提供排序。
 而之后则直接使用了[ConfigurationClassParser][code-ConfigurationClassParser]，它里面并没有排序的逻辑。
