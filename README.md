@@ -499,6 +499,7 @@ public class SampleApplication {
   [core-ApplicationContext]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/ApplicationContext.html
   [core-ApplicationEventPublisherAware]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisherAware.html
   [core-ApplicationEventPublisher]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/ApplicationEventPublisher.html
+  [core-ApplicationEvent]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/ApplicationEvent.html
   [core-ApplicationListener]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/ApplicationListener.html
   [core-Aware]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/beans/factory/Aware.html
   [core-BeanClassLoaderAware]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/beans/factory/BeanClassLoaderAware.html
