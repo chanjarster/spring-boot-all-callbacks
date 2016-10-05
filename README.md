@@ -118,10 +118,9 @@ public class SampleApplication {
   是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L60][code-ConfigurationWarningsApplicationContextInitializer#L60]
   1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类[PropertySourceOrderingPostProcessor][code-PropertySourceOrderingPostProcessor]，
   是在 **创建及准备ApplicationContext 2.6** 时添加的：[#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244]
-  1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]
+  1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]，负责读取[BeanDefinition][core-负责读取BeanDefinition]
   是在 **创建及准备ApplicationContext 1.1** 时添加的
-    1. 
-1. TODO
+1. 
 
 ### 推送ApplicationReadyEvent or ApplicationFailedEvent
 
@@ -203,15 +202,16 @@ TODO
 
 ### BeanPostProcessor
 
-[javadoc][core-BeanPostProcessor]
+[javadoc][core-BeanPostProcessor] [相关文档][ref-beans-factory-extension-bpp]
 
 用来对Bean**实例**进行修改的勾子，根据Javadoc ApplicationContext会自动侦测到BeanPostProcessor Bean，然后将它们应用到后续创建的所有Bean上。
 
 ### BeanFactoryPostProcessor和BeanDefinitionRegistryPostProcessor
 
-它们的作用这里就多讲了，看javadoc就明白了，不过要注意的是[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]是[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]的子接口。
+[相关文档][ref-beans-factory-extension-factory-postprocessors]
 
-在Spring的启动过程中，会先调用[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]然后再调用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]。这一点可以在 [PostProcessorRegistrationDelegate#invokeBeanFactoryPostProcessors][code-PostProcessorRegistrationDelegate#L57]中看出来
+[PostProcessorRegistrationDelegate#L57][code-PostProcessorRegistrationDelegate#L57]负责调用[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]和[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]。
+[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]在[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]之前被调用。
 
 
 ### *Aware
@@ -405,8 +405,8 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [code-ConfigurationWarningsApplicationContextInitializer#L75]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/ConfigurationWarningsApplicationContextInitializer.java#L75
   [code-EventPublishingRunListener#L73]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/event/EventPublishingRunListener.java#L73
   [code-EventPublishingRunListener#L78]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/event/EventPublishingRunListener.java#L78
-  [code-PostProcessorRegistrationDelegate#L57]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/PostProcessorRegistrationDelegate.java#L57
   [code-PropertySourceOrderingPostProcessor]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L285
+  [code-PostProcessorRegistrationDelegate#L57]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/PostProcessorRegistrationDelegate.java#L57
   [code-SharedMetadataReaderFactoryContextInitializer#L57]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L57
   [code-SharedMetadataReaderFactoryContextInitializer]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java
   [code-SpringApplication#L603]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L603
@@ -500,3 +500,5 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [ref-boot-features-logging]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-logging
   [ref-boot-howto-customize-the-environment-or-application-context]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#howto-customize-the-environment-or-application-context
   [ref-using-boot-auto-configuration]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#using-boot-auto-configuration
+  [ref-beans-factory-extension-bpp]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/spring-framework-reference/htmlsingle/#beans-factory-extension-bpp
+  [ref-beans-factory-extension-factory-postprocessors]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/spring-framework-reference/htmlsingle/#beans-factory-extension-factory-postprocessors
