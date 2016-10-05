@@ -351,7 +351,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 1. [AutowiredAnnotationBeanPostProcessor][core-AutowiredAnnotationBeanPostProcessor]
 1. [RequiredAnnotationBeanPostProcessor][core-RequiredAnnotationBeanPostProcessor]
 1. [CommonAnnotationBeanPostProcessor][core-CommonAnnotationBeanPostProcessor]
-1. [EventListenerMethodProcessor]
+1. [EventListenerMethodProcessor][core-EventListenerMethodProcessor]
 1. [PersistenceAnnotationBeanPostProcessor][core-PersistenceAnnotationBeanPostProcessor]
 
 
