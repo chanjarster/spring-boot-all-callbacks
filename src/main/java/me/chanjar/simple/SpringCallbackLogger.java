@@ -1,4 +1,4 @@
-package me.chanjar.simple.callback;
+package me.chanjar.simple;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

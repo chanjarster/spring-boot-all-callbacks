@@ -11,5 +11,8 @@ org.springframework.boot.env.EnvironmentPostProcessor=\
   me.chanjar.simple.callback.MyEnvironmentPostProcessor
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  me.chanjar.simple.callback.MyAutoConfiguration,\
-  me.chanjar.simple.callback.MyAutoConfiguration2
+  me.chanjar.simple.autoconfigure.InsideAutoConfiguration,\
+  me.chanjar.simple.autoconfigure.InsideAutoConfiguration2,\
+  me.chanjar.outside.autoconfigure.OutsideAutoConfiguration,\
+  me.chanjar.outside.autoconfigure.OutsideAutoConfiguration2,\
+  me.chanjar.outside.autoconfigure.UselessDeferredImportSelectorAutoConfiguration

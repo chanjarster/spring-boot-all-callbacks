@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import static me.chanjar.simple.callback.SpringCallbackLogger.LOGGER;
+import static me.chanjar.simple.SpringCallbackLogger.LOGGER;
 /**
  * Created by qianjia on 2016/10/2.
  */

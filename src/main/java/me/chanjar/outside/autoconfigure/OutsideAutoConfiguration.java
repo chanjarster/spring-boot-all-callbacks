@@ -1,4 +1,4 @@
-package me.chanjar.simple.callback;
+package me.chanjar.outside.autoconfigure;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,14 +9,15 @@ import static me.chanjar.simple.SpringCallbackLogger.LOGGER;
  * Created by qianjia on 2016/10/4.
  */
 @Configuration
-public class MyConfiguration {
+public class OutsideAutoConfiguration {
 
-  public MyConfiguration() {
+  public OutsideAutoConfiguration() {
     LOGGER.info("*** {}", getClass().getSimpleName());
   }
 
   @Bean
-  public String myConfigurationBean() {
-    return "myConfigurationBean";
+  public String outsideAutoConfigurationBean() {
+    return "outsideAutoConfigurationBean";
   }
+
 }

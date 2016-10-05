@@ -3,7 +3,7 @@ package me.chanjar.simple.callback;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import static me.chanjar.simple.callback.SpringCallbackLogger.LOGGER;
+import static me.chanjar.simple.SpringCallbackLogger.LOGGER;
 
 /**
  * Created by qianjia on 2016/10/2.

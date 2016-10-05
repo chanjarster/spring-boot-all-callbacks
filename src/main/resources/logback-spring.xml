@@ -12,7 +12,7 @@
     </encoder>
   </appender>
 
-  <logger name="me.chanjar.simple.callback.SpringCallbackLogger" additivity="false">
+  <logger name="me.chanjar.simple.SpringCallbackLogger" additivity="false">
     <appender-ref ref="CONSOLE_SP" />
   </logger>
 
