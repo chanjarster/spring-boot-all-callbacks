@@ -243,9 +243,9 @@ TODO
 而不同之处有：
 
 1. 加载方式不同：
-    *. 普通[@Configuration][core-Configuration]则是通过扫描package path加载的 
-    *. [Auto-configuration][ref-using-boot-auto-configuration]的是通过读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.boot.autoconfigure.EnableAutoConfiguration``的property列出的[@Configuration][core-Configuration]加载的
-1. 加载顺序不同：普通[@Configuration]的加载永远在[Auto-configuration][ref-using-boot-auto-configuration]之前
+    * 普通[@Configuration][core-Configuration]则是通过扫描package path加载的 
+    * [Auto-configuration][ref-using-boot-auto-configuration]的是通过读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.boot.autoconfigure.EnableAutoConfiguration``的property列出的[@Configuration][core-Configuration]加载的
+1. 加载顺序不同：普通[@Configuration][core-Configuration]的加载永远在[Auto-configuration][ref-using-boot-auto-configuration]之前
 1. 内部加载顺序可控上的不同：
     * 普通[@Configuration][core-Configuration]则无法控制加载顺序
     * [Auto-configuration][ref-using-boot-auto-configuration]可以使用[@AutoConfigureOrder][boot-AutoConfigureOrder]、[@AutoConfigureBefore][boot-AutoConfigureBefore]、[@AutoConfigureAfter][boot-AutoConfigureAfter]
