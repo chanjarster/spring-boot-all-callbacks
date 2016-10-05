@@ -19,36 +19,33 @@ public class SampleApplication {
 
 ### 初始化SpringApplication
 
-1. ``SpringApplication#run(Object source, String... args)``[#L1173][code-SpringApplicationL1173]
-1. [SpringApplication#L1185][code-SpringApplicationL1185] -> ``SpringApplication(sources)``[#L236][code-SpringApplicationL236]
+1. ``SpringApplication#run(Object source, String... args)``[#L1174][code-SpringApplicationL1174]
+1. [SpringApplication#L1186][code-SpringApplicationL1186] -> ``SpringApplication(sources)``[#L236][code-SpringApplicationL236]
   1. ``SpringApplication#initialize(Object[] sources)``[#L256][code-SpringApplicationL256] [javadoc][boot-SpringApplication]
     1. [SpringApplication#L257][code-SpringApplicationL257] 添加source（复数），``SpringApplication``使用source来构建Bean。
     一般来说在``run``的时候都会把[@SpringBootApplication][boot-SpringBootApplication]标记的类(本例中是SampleApplication)放到``sources``参数里，然后由这个类出发找到Bean的定义。
     2. [SpringApplication#L261][code-SpringApplicationL261] 初始化[ApplicationContextInitializer][core-ApplicationContextInitializer]列表（见附录）
     3. [SpringApplication#L263][code-SpringApplicationL263] 初始化[ApplicationListener][core-ApplicationListener]列表（见附录）
-1. [SpringApplication#L1185][code-SpringApplicationL1185] -> ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]，进入运行阶段
-
-所以在spring boot应用的初始化阶段只需要[ApplicationContextInitializer][core-ApplicationContextInitializer]和[ApplicationListener][core-ApplicationListener]。
-由此可以推断，诸如[@Configuration][core-Configuration]的工作、Bean定义加载、Bean创建等工作等都是在后续阶段进行的。
+1. [SpringApplication#L1186][code-SpringApplicationL1186] -> ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]，进入运行阶段
 
 
 ### 推送ApplicationStartedEvent
 
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
 
-1. [SpringApplication#L302][code-SpringApplicationL302] 初始化[SpringApplicationRunListeners][code-SpringApplicationRunListeners]([SpringApplicationRunListener][boot-SpringApplicationRunListener]的集合)。
+1. [SpringApplication#L303][code-SpringApplicationL303] 初始化[SpringApplicationRunListeners][code-SpringApplicationRunListeners]([SpringApplicationRunListener][boot-SpringApplicationRunListener]的集合)。
 它内部只包含[EventPublishingRunListener][boot-EventPublishingRunListener]。
-1. [SpringApplication#L303][code-SpringApplicationL303] 推送[ApplicationStartedEvent][boot-ApplicationStartedEvent]给所有的[ApplicationListener][core-ApplicationListener]（见附录）。 下面是关心此事件的listener：
+1. [SpringApplication#L304][code-SpringApplicationL304] 推送[ApplicationStartedEvent][boot-ApplicationStartedEvent]给所有的[ApplicationListener][core-ApplicationListener]（见附录）。 下面是关心此事件的listener：
     1. [LiquibaseServiceLocatorApplicationListener][boot-LiquibaseServiceLocatorApplicationListener]
     1. [LoggingApplicationListener][boot-LoggingApplicationListener]（见附录）
 
 ### 准备Environment
 
-``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]->[#L307][code-SpringApplicationL307]->``SpringApplication#prepareEnvironment(...)``[#L329][code-SpringApplicationL329]准备[ConfigurableEnvironment][core-ConfigurableEnvironment]。
+``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]->[#L308][code-SpringApplicationL308]->``prepareEnvironment(...)``[#L331][code-SpringApplicationL331]准备[ConfigurableEnvironment][core-ConfigurableEnvironment]。
 
-1. [SpringApplication#L333][code-SpringApplicationL333] 创建[StandardEnvironment][core-StandardEnvironment]（见附录）。
-1. [SpringApplication#L334][code-SpringApplicationL334] 配置[StandardEnvironment][core-StandardEnvironment]，将命令行和默认参数整吧整吧，添加到[MutablePropertySources][core-MutablePropertySources]。
-1. [SpringApplication#L335][code-SpringApplicationL335] 推送[ApplicationEnvironmentPreparedEvent][boot-ApplicationEnvironmentPreparedEvent]给所有的[ApplicationListener][core-ApplicationListener]（见附录）。下面是关心此事件的listener:
+1. [SpringApplication#L335][code-SpringApplicationL335] 创建[StandardEnvironment][core-StandardEnvironment]（见附录）。
+1. [SpringApplication#L336][code-SpringApplicationL336] 配置[StandardEnvironment][core-StandardEnvironment]，将命令行和默认参数整吧整吧，添加到[MutablePropertySources][core-MutablePropertySources]。
+1. [SpringApplication#L337][code-SpringApplicationL337] 推送[ApplicationEnvironmentPreparedEvent][boot-ApplicationEnvironmentPreparedEvent]给所有的[ApplicationListener][core-ApplicationListener]（见附录）。下面是关心此事件的listener:
   1. [BackgroundPreinitializer][boot-BackgroundPreinitializer]
   1. [FileEncodingApplicationListener][boot-FileEncodingApplicationListener]
   1. [AnsiOutputApplicationListener][boot-AnsiOutputApplicationListener]
@@ -64,20 +61,18 @@ public class SampleApplication {
 
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
 
-1. [SpringApplication#L310][code-SpringApplicationL310]->``SpringApplication#createApplicationContext()``[#L581][code-SpringApplicationL581]创建[ApplicationContext][core-ApplicationContext]。
-可以看到实际上创建的是[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]。
+1. [SpringApplication#L311][code-SpringApplicationL311]->``SpringApplication#createApplicationContext()``[#L583][code-SpringApplicationL583]创建[ApplicationContext][core-ApplicationContext]。可以看到实际上创建的是[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]。
   1. 在构造[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]的时候，间接注册了一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]的Bean：[ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]。
   经由[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader][构造函数][code-AnnotatedBeanDefinitionReader#L83]->[AnnotationConfigUtils.registerAnnotationConfigProcessors][code-AnnotationConfigUtils#L160]。
-1. [SpringApplication#L311][code-SpringApplicationL311]->``SpringApplication#prepareContext(...)``[#L342][code-SpringApplicationL342]准备[ApplicationContext][core-ApplicationContext]
-  1. [SpringApplication#L345][code-SpringApplicationL345]->``context.setEnvironment(environment)``，把之前准备好的[Environment][core-Environment]塞给[ApplicationContext][core-ApplicationContext]
-  1. [SpringApplication#L346][code-SpringApplicationL346]->``postProcessApplicationContext(context)``[#L603][code-SpringApplication#L603]，给[ApplicationContext][core-ApplicationContext]设置了一些其他东西
-  1. [SpringApplication#L347][code-SpringApplicationL347]->``applyInitializers(context)``[#L628][code-SpringApplication#L628]，调用之前准备好的[ApplicationContextInitializer][core-ApplicationContextInitializer]
-  1. [SpringApplication#L348][code-SpringApplicationL347]->``listeners.contextPrepared(context)``->[EventPublishingRunListener.contextPrepared][code-EventPublishingRunListener#L73]，但实际上啥都没做。
-  1. [SpringApplication#L364][code-SpringApplicationL364]->``load``[#L685][code-SpringApplication#L685]，负责将source(复数)里所定义的Bean加载到[ApplicationContext][core-ApplicationContext]里，在本例中就是SampleApplication，这些source是在**初始化SpringApplication**阶段获得的。
-  1. [SpringApplication#L365][code-SpringApplicationL365]->``listeners.contextLoaded(context)``->[EventPublishingRunListener.contextLoaded][code-EventPublishingRunListener#L78]。
+1. [SpringApplication#L313][code-SpringApplicationL313]->``SpringApplication#prepareContext(...)``[#L344][code-SpringApplicationL344]准备[ApplicationContext][core-ApplicationContext]
+  1. [SpringApplication#L347][code-SpringApplicationL347]->``context.setEnvironment(environment)``，把之前准备好的[Environment][core-Environment]塞给[ApplicationContext][core-ApplicationContext]
+  1. [SpringApplication#L348][code-SpringApplicationL348]->``postProcessApplicationContext(context)``[#L605][code-SpringApplication#L605]，给[ApplicationContext][core-ApplicationContext]设置了一些其他东西
+  1. [SpringApplication#L349][code-SpringApplicationL349]->``applyInitializers(context)``[#L630][code-SpringApplication#L630]，调用之前准备好的[ApplicationContextInitializer][core-ApplicationContextInitializer]
+  1. [SpringApplication#L350][code-SpringApplicationL350]->``listeners.contextPrepared(context)``->[EventPublishingRunListener.contextPrepared][code-EventPublishingRunListener#L73]，但实际上啥都没做。
+  1. [SpringApplication#L366][code-SpringApplicationL366]->``load``[#L687][code-SpringApplication#L687]，负责将source(复数)里所定义的Bean加载到[ApplicationContext][core-ApplicationContext]里，在本例中就是SampleApplication，这些source是在**初始化SpringApplication**阶段获得的。
+  1. [SpringApplication#L367][code-SpringApplicationL367]->``listeners.contextLoaded(context)``->[EventPublishingRunListener.contextLoaded][code-EventPublishingRunListener#L78]。
     1. 将[SpringApplication][boot-SpringApplication]自己拥有的[ApplicationListener][core-ApplicationListener]加入到[ApplicationContext][core-ApplicationContext]
-    1. 发送[ApplicationPreparedEvent][boot-ApplicationPreparedEvent]。
-    目前已知关心这个事件的有[ConfigFileApplicationListener][boot-ConfigFileApplicationListener]、[LoggingApplicationListener][boot-LoggingApplicationListener]、[ApplicationPidFileWriter][boot-ApplicationPidFileWriter]
+    1. 发送[ApplicationPreparedEvent][boot-ApplicationPreparedEvent]。目前已知关心这个事件的有[ConfigFileApplicationListener][boot-ConfigFileApplicationListener]、[LoggingApplicationListener][boot-LoggingApplicationListener]、[ApplicationPidFileWriter][boot-ApplicationPidFileWriter]
   
 要注意的是在这个阶段，[ApplicationContext][core-ApplicationContext]里只有SampleApplication，SampleApplication是Bean的加载工作的起点。
 
@@ -87,15 +82,11 @@ public class SampleApplication {
 ->[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或者[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]
 
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
+->[#L315][code-SpringApplicationL315]->``SpringApplication#refreshContext(context)``[#L370][code-SpringApplicationL370]
+->[#L371][code-SpringApplicationL371]->``SpringApplication#refresh(context)``[#L759][code-SpringApplicationL759]
+->[#L761][code-SpringApplicationL761]->``AbstractApplicationContext#refresh``[AbstractApplicationContext#L507][code-AbstractApplicationContext#L507]
 
-->[#L313][code-SpringApplicationL313]->``SpringApplication#refreshContext(context)``[#L368][code-SpringApplicationL368]
-
-->[#L369][code-SpringApplicationL369]->``SpringApplication#refresh(context)``[#L757][code-SpringApplicationL757]
-
-->[#L759][code-SpringApplicationL759]->``AbstractApplicationContext#refresh``[AbstractApplicationContext#L507][code-AbstractApplicationContext#L507]
-
-1. [AbstractApplicationContext#L510][code-AbstractApplicationContext#L510]->``AbstractApplicationContext#prepareRefresh()``[#L575][code-AbstractApplicationContext#L575]，做了一些初始化工作，
-比如设置了当前Context的状态，初始化propertySource（其实啥都没干），检查required的property是否都已在Environment中（其实并没有required的property可供检查）等。
+1. [AbstractApplicationContext#L510][code-AbstractApplicationContext#L510]->``AbstractApplicationContext#prepareRefresh()``[#L575][code-AbstractApplicationContext#L575]，做了一些初始化工作，比如设置了当前Context的状态，初始化propertySource（其实啥都没干），检查required的property是否都已在Environment中（其实并没有required的property可供检查）等。
 1. [AbstractApplicationContext#L513][code-AbstractApplicationContext#L513]->``obtainFreshBeanFactory()``[#L611][code-AbstractApplicationContext#L611]，获得[BeanFactory][core-BeanFactory]，实际上这里获得的是[DefaultListableBeanFactory][core-DefaultListableBeanFactory]
 1. [AbstractApplicationContext#L516][code-AbstractApplicationContext#L516]->``prepareBeanFactory(beanFactory)``[#L625][code-AbstractApplicationContext#L625]准备[BeanFactory][core-BeanFactory]
   1. 给beanFactory设置了ClassLoader
@@ -111,16 +102,23 @@ public class SampleApplication {
   1. 把``getEnvironment().getSystemEnvironment()``作为Bean添加到beanFactory中，Bean Name: systemEnvironment
 1. [AbstractApplicationContext#L520][code-AbstractApplicationContext#L520]->``postProcessBeanFactory(beanFactory)``，后置处理[BeanFactory][core-BeanFactory]，实际啥都没做
 1. [AbstractApplicationContext#L523][code-AbstractApplicationContext#L523]->``invokeBeanFactoryPostProcessors(beanFactory)``，
-利用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对beanFactory做后置处理。目前已知的[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]有四个：
-  1. [SharedMetadataReaderFactoryContextInitializer][code-SharedMetadataReaderFactoryContextInitializer]的内部类[CachingMetadataReaderFactoryPostProcessor][code-CachingMetadataReaderFactoryPostProcessor]，
-  是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L57][code-SharedMetadataReaderFactoryContextInitializer#L57]
-  1. [ConfigurationWarningsApplicationContextInitializer][boot-ConfigurationWarningsApplicationContextInitializer]的内部类[ConfigurationWarningsPostProcessor][code-ConfigurationWarningsApplicationContextInitializer#L75]，
-  是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L60][code-ConfigurationWarningsApplicationContextInitializer#L60]
-  1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类[PropertySourceOrderingPostProcessor][code-PropertySourceOrderingPostProcessor]，
-  是在 **创建及准备ApplicationContext 2.6** 时添加的：[#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244]
+利用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对beanFactory做后置处理。调用此方法时有四个[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]：
+  1. [SharedMetadataReaderFactoryContextInitializer][code-SharedMetadataReaderFactoryContextInitializer]的内部类[CachingMetadataReaderFactoryPostProcessor][code-CachingMetadataReaderFactoryPostProcessor]，是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L57][code-SharedMetadataReaderFactoryContextInitializer#L57]
+  1. [ConfigurationWarningsApplicationContextInitializer][boot-ConfigurationWarningsApplicationContextInitializer]的内部类[ConfigurationWarningsPostProcessor][code-ConfigurationWarningsApplicationContextInitializer#L75]，是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L60][code-ConfigurationWarningsApplicationContextInitializer#L60]
+  1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类[PropertySourceOrderingPostProcessor][code-PropertySourceOrderingPostProcessor]，是在 **创建及准备ApplicationContext 2.6** 时添加的：[#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244]
   1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]，负责读取[BeanDefinition][core-BeanDefinition]
   是在 **创建及准备ApplicationContext 1.1** 时添加的
-1. 
+1. [AbstractApplicationContext#L526][code-AbstractApplicationContext#L526]->``registerBeanPostProcessors(beanFactory)``，注册[BeanPostProcessor][core-BeanPostProcessor]
+1. [AbstractApplicationContext#L529][code-AbstractApplicationContext#L529]->``initMessageSource()``[#L704][code-AbstractApplicationContext#L704]，初始化[MessageSource][core-MessageSource]，不过其实此时的[MessageSource][core-MessageSource]是个Noop对象。
+1. [AbstractApplicationContext#L532][code-AbstractApplicationContext#L532]->``initApplicationEventMulticaster()``[#L739][code-AbstractApplicationContext#L739]，初始化[ApplicationEventMulticaster][core-ApplicationEventMulticaster]。
+1. [AbstractApplicationContext#L535][code-AbstractApplicationContext#L535]->``onRefresh()``[#L793][code-AbstractApplicationContext#L793]，这个方法啥都没做
+1. [AbstractApplicationContext#L538][code-AbstractApplicationContext#L538]->``registerListeners()``[#L801][code-AbstractApplicationContext#L801]，把自己的[ApplicationListener][core-ApplicationListener]注册到[ApplicationEventMulticaster][core-ApplicationEventMulticaster]里，
+并且将之前因为没有[ApplicationEventMulticaster][core-ApplicationEventMulticaster]而无法发出的[ApplicationEvent][core-ApplicationEvent]发送出去。
+1. [AbstractApplicationContext#L541][code-AbstractApplicationContext#L541]->``finishBeanFactoryInitialization``[#L828][code-AbstractApplicationContext#L828]。
+注意[#L861][code-AbstractApplicationContext#L861]，在这一步的时候才会实例化所有non-lazy-init bean，这里说的实例化不只是new而已，注入、[BeanPostProcessor][core-BeanPostProcessor]都会执行。
+1. [AbstractApplicationContext#L544][code-AbstractApplicationContext#L544]->``finishRefresh()``[#L869][code-AbstractApplicationContext#L869]。
+  1. 在[#L877][code-AbstractApplicationContext#L877]发送了[ContextRefreshedEvent][core-ContextRefreshedEvent]
+
 
 ### 推送ApplicationReadyEvent or ApplicationFailedEvent
 
@@ -345,6 +343,16 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 
 它使用[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader]来读取[@Configuration][core-Configuration]和[@Component][core-Component]。
 
+### AnnotatedBeanDefinitionReader
+
+[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader]在其构造函数内部间接([AnnotationConfigUtils#L145][code-AnnotationConfigUtils#L145])的给[BeanFactory][core-BeanFactory]注册了几个用来处理Spring关心的注解的类。
+
+1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]
+1. [AutowiredAnnotationBeanPostProcessor][core-AutowiredAnnotationBeanPostProcessor]
+1. [RequiredAnnotationBeanPostProcessor][core-RequiredAnnotationBeanPostProcessor]
+1. [CommonAnnotationBeanPostProcessor][core-CommonAnnotationBeanPostProcessor]
+1. [EventListenerMethodProcessor]
+1. [PersistenceAnnotationBeanPostProcessor][core-PersistenceAnnotationBeanPostProcessor]
 
 
   [boot-AnnotationConfigEmbeddedWebApplicationContext]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/context/embedded/AnnotationConfigEmbeddedWebApplicationContext.html
@@ -378,15 +386,30 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [boot-SpringApplicationRunListener]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/SpringApplicationRunListener.html
   [boot-SpringApplication]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/SpringApplication.html
   [boot-SpringBootApplication]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/autoconfigure/SpringBootApplication.html
+  [code-AnnotationConfigUtils#L145]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L145
   [code-AbstractApplicationContext#L507]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L507
   [code-AbstractApplicationContext#L510]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L510
   [code-AbstractApplicationContext#L513]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L513
   [code-AbstractApplicationContext#L516]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L516
   [code-AbstractApplicationContext#L520]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L520
   [code-AbstractApplicationContext#L523]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L523
+  [code-AbstractApplicationContext#L526]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L526
   [code-AbstractApplicationContext#L575]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L575
   [code-AbstractApplicationContext#L611]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L611
   [code-AbstractApplicationContext#L625]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L625
+  [code-AbstractApplicationContext#L526]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L526
+  [code-AbstractApplicationContext#L532]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L532
+  [code-AbstractApplicationContext#L535]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L535
+  [code-AbstractApplicationContext#L538]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L538
+  [code-AbstractApplicationContext#L541]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L541
+  [code-AbstractApplicationContext#L544]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L544
+  [code-AbstractApplicationContext#L704]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L704
+  [code-AbstractApplicationContext#L739]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L739
+  [code-AbstractApplicationContext#L793]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L793
+  [code-AbstractApplicationContext#L801]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L801
+  [code-AbstractApplicationContext#L828]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L828
+  [code-AbstractApplicationContext#L861]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L861
+  [code-AbstractApplicationContext#L869]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L869
   [code-AnnotatedBeanDefinitionReader#L83]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.java#L83
   [code-AnnotationConfigApplicationContext#L51]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigApplicationContext.java#L51
   [code-AnnotationConfigUtils#L145]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L145
@@ -409,44 +432,48 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [code-PostProcessorRegistrationDelegate#L57]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/PostProcessorRegistrationDelegate.java#L57
   [code-SharedMetadataReaderFactoryContextInitializer#L57]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L57
   [code-SharedMetadataReaderFactoryContextInitializer]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java
-  [code-SpringApplication#L603]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L603
-  [code-SpringApplication#L628]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
-  [code-SpringApplication#L685]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L685
-  [code-SpringApplicationL1173]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1173
-  [code-SpringApplicationL1185]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1185
+  [code-SpringApplication#L605]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L605
+  [code-SpringApplication#L630]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L630
+  [code-SpringApplication#L687]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L687
+  [code-SpringApplicationL1174]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1174
+  [code-SpringApplicationL1186]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L1186
   [code-SpringApplicationL236]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L236
   [code-SpringApplicationL256]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L256
   [code-SpringApplicationL257]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L257
   [code-SpringApplicationL261]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L261
   [code-SpringApplicationL263]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L263
   [code-SpringApplicationL297]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L297
-  [code-SpringApplicationL302]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L302
   [code-SpringApplicationL303]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L303
-  [code-SpringApplicationL307]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L307
-  [code-SpringApplicationL310]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L310
+  [code-SpringApplicationL304]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L304
+  [code-SpringApplicationL308]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L308
   [code-SpringApplicationL311]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L311
   [code-SpringApplicationL313]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L313
-  [code-SpringApplicationL329]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L329
-  [code-SpringApplicationL333]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L333
-  [code-SpringApplicationL334]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L334
+  [code-SpringApplicationL315]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L315
+  [code-SpringApplicationL331]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L331
   [code-SpringApplicationL335]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L335
-  [code-SpringApplicationL342]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L342
-  [code-SpringApplicationL345]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L345
-  [code-SpringApplicationL346]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L346
+  [code-SpringApplicationL336]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L336
+  [code-SpringApplicationL337]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L337
+  [code-SpringApplicationL344]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L344
   [code-SpringApplicationL347]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L347
-  [code-SpringApplicationL364]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L364
-  [code-SpringApplicationL365]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L365
-  [code-SpringApplicationL368]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L368
-  [code-SpringApplicationL369]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L369
-  [code-SpringApplicationL581]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L581
+  [code-SpringApplicationL348]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L348
+  [code-SpringApplicationL349]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L349
+  [code-SpringApplicationL350]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L350
+  [code-SpringApplicationL366]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L366
+  [code-SpringApplicationL367]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L367
+  [code-SpringApplicationL370]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L370
+  [code-SpringApplicationL371]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L371
+  [code-SpringApplicationL583]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L583
   [code-SpringApplicationL603]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L603
   [code-SpringApplicationL628]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L628
   [code-SpringApplicationL685]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L685
-  [code-SpringApplicationL757]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L757
   [code-SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
+  [code-SpringApplicationL761]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L761
   [code-SpringApplicationRunListeners]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplicationRunListeners.java
   [code-spring-4.3.3.RELEASE]: https://github.com/spring-projects/spring-framework/tree/v4.3.3.RELEASE
   [code-spring-boot-1.4.1.RELEASE]: https://github.com/spring-projects/spring-boot/tree/v1.4.1.RELEASE
+  [core-MessageSource]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/MessageSource.html
+  [core-ApplicationEventMulticaster]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/event/SimpleApplicationEventMulticaster.html
+  [core-ContextRefreshedEvent]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/event/ContextRefreshedEvent.html
   [core-AnnotatedBeanDefinitionReader]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.html
   [core-AnnotationAwareOrderComparator]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/core/annotation/AnnotationAwareOrderComparator.html
   [core-AnnotationConfigApplicationContext]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html
@@ -494,6 +521,11 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [core-ResourceLoader]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/core/io/ResourceLoader.html
   [core-StandardBeanExpressionResolver]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/expression/StandardBeanExpressionResolver.html
   [core-StandardEnvironment]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/core/env/StandardEnvironment.html
+  [core-AutowiredAnnotationBeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/beans/factory/annotation/AutowiredAnnotationBeanPostProcessor.html
+  [core-RequiredAnnotationBeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/beans/factory/annotation/RequiredAnnotationBeanPostProcessor.html
+  [core-CommonAnnotationBeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/annotation/CommonAnnotationBeanPostProcessor.html
+  [core-EventListenerMethodProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/event/EventListenerMethodProcessor.html
+  [core-PersistenceAnnotationBeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/orm/jpa/support/PersistenceAnnotationBeanPostProcessor.html
   [ref-boot-features-condition-annotations]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-condition-annotations
   [ref-boot-features-custom-log-configuration]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-custom-log-configuration
   [ref-boot-features-external-config]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-external-config

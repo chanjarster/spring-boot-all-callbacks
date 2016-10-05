@@ -16,17 +16,31 @@
 
 package me.chanjar.simple.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HelloWorldService {
 
-	@Value("${name:World}")
 	private String name;
+
+	private String anotherBean;
 
 	public String getHelloMessage() {
 		return "Hello " + this.name;
+	}
+
+	@Value("${name:World}")
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Autowired
+	@Qualifier("myConfigurationBean")
+	public void setAnotherBean(String anotherBean) {
+		this.anotherBean = anotherBean;
 	}
 
 }
