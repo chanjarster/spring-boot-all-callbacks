@@ -119,12 +119,20 @@ public class SampleApplication {
 1. [AbstractApplicationContext#L544][code-AbstractApplicationContext#L544]->``finishRefresh()``[#L869][code-AbstractApplicationContext#L869]。
   1. 在[#L877][code-AbstractApplicationContext#L877]发送了[ContextRefreshedEvent][core-ContextRefreshedEvent]
 
+### 调用 ApplicationRunner 和 CommandLineRunner
+
+``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
+->``afterRefresh(context, applicationArguments)``[#L316][code-SpringApplicationL316]
+->``callRunners(context, args)``[#L771][code-SpringApplicationL771]
+->[#L774][code-SpringApplicationL774] 先后调用了当前[ApplicationContext][core-ApplicationContext]中的[ApplicationRunner][boot-ApplicationRunner]和[CommandLineRunner][boot-CommandLineRunner]。关于它们的相关文档可以看[这里][ref-boot-features-command-line-runner]。
+
+需要注意的是，此时的[ApplicationContext][core-ApplicationContext]已经刷新完毕了，该有的Bean都已经有了。
 
 ### 推送ApplicationReadyEvent or ApplicationFailedEvent
 
-``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
+``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]->``listeners.finished(context, null)``[#L317][code-SpringApplicationL317]
+间接地调用了``EventPublishingRunListener#getFinishedEvent``[EventPublishingRunListener#L96][code-EventPublishingRunListener#L96]，发送了[ApplicationReadyEvent][boot-ApplicationReadyEvent]或[ApplicationFailedEvent][boot-ApplicationFailedEvent]
 
-TODO
 
 
 ## 回调接口
@@ -353,6 +361,8 @@ TODO
 1. [PersistenceAnnotationBeanPostProcessor][core-PersistenceAnnotationBeanPostProcessor]
 
 
+  [boot-ApplicationReadyEvent]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/context/event/ApplicationReadyEvent.html
+  [boot-ApplicationFailedEvent]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/context/event/ApplicationFailedEvent.html
   [boot-AnnotationConfigEmbeddedWebApplicationContext]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/context/embedded/AnnotationConfigEmbeddedWebApplicationContext.html
   [boot-AnsiOutputApplicationListener]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/context/config/AnsiOutputApplicationListener.html
   [boot-ApplicationEnvironmentPreparedEvent]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html
@@ -385,6 +395,8 @@ TODO
   [boot-SpringApplication]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/SpringApplication.html
   [boot-SpringBootApplication]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/autoconfigure/SpringBootApplication.html
   [code-AnnotationConfigUtils#L145]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L145
+  [boot-ApplicationRunner]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/ApplicationRunner.html
+  [boot-CommandLineRunner]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/api/org/springframework/boot/CommandLineRunner.html
   [code-AbstractApplicationContext#L507]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L507
   [code-AbstractApplicationContext#L510]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L510
   [code-AbstractApplicationContext#L513]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L513
@@ -428,6 +440,7 @@ TODO
   [code-ConfigurationWarningsApplicationContextInitializer#L75]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/ConfigurationWarningsApplicationContextInitializer.java#L75
   [code-EventPublishingRunListener#L73]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/event/EventPublishingRunListener.java#L73
   [code-EventPublishingRunListener#L78]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/event/EventPublishingRunListener.java#L78
+  [code-EventPublishingRunListener#L96]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/event/EventPublishingRunListener.java#L96
   [code-PropertySourceOrderingPostProcessor]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/context/config/ConfigFileApplicationListener.java#L285
   [code-PostProcessorRegistrationDelegate#L57]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/PostProcessorRegistrationDelegate.java#L57
   [code-SharedMetadataReaderFactoryContextInitializer#L57]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/SharedMetadataReaderFactoryContextInitializer.java#L57
@@ -449,6 +462,7 @@ TODO
   [code-SpringApplicationL311]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L311
   [code-SpringApplicationL313]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L313
   [code-SpringApplicationL315]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L315
+  [code-SpringApplicationL317]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L317
   [code-SpringApplicationL331]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L331
   [code-SpringApplicationL335]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L335
   [code-SpringApplicationL336]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L336
@@ -468,6 +482,9 @@ TODO
   [code-SpringApplicationL685]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L685
   [code-SpringApplicationL759]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L759
   [code-SpringApplicationL761]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L761
+  [code-SpringApplicationL316]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L316
+  [code-SpringApplicationL771]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L771
+  [code-SpringApplicationL774]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java#L774
   [code-SpringApplicationRunListeners]: https://github.com/spring-projects/spring-boot/blob/v1.4.1.RELEASE/spring-boot/src/main/java/org/springframework/boot/SpringApplicationRunListeners.java
   [code-spring-4.3.3.RELEASE]: https://github.com/spring-projects/spring-framework/tree/v4.3.3.RELEASE
   [code-spring-boot-1.4.1.RELEASE]: https://github.com/spring-projects/spring-boot/tree/v1.4.1.RELEASE
@@ -537,3 +554,4 @@ TODO
   [ref-using-boot-auto-configuration]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#using-boot-auto-configuration
   [ref-beans-factory-extension-bpp]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/spring-framework-reference/htmlsingle/#beans-factory-extension-bpp
   [ref-beans-factory-extension-factory-postprocessors]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/spring-framework-reference/htmlsingle/#beans-factory-extension-factory-postprocessors
+  [ref-boot-features-command-line-runner]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-command-line-runner
