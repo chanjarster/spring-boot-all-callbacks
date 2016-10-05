@@ -22,8 +22,7 @@ public class SampleApplication {
 1. ``SpringApplication#run(Object source, String... args)``[#L1174][code-SpringApplicationL1174]
 1. [SpringApplication#L1186][code-SpringApplicationL1186] -> ``SpringApplication(sources)``[#L236][code-SpringApplicationL236]
   1. ``SpringApplication#initialize(Object[] sources)``[#L256][code-SpringApplicationL256] [javadoc][boot-SpringApplication]
-    1. [SpringApplication#L257][code-SpringApplicationL257] 添加source（复数），``SpringApplication``使用source来构建Bean。
-    一般来说在``run``的时候都会把[@SpringBootApplication][boot-SpringBootApplication]标记的类(本例中是SampleApplication)放到``sources``参数里，然后由这个类出发找到Bean的定义。
+    1. [SpringApplication#L257][code-SpringApplicationL257] 添加source（复数），``SpringApplication``使用source来构建Bean。一般来说在``run``的时候都会把[@SpringBootApplication][boot-SpringBootApplication]标记的类(本例中是SampleApplication)放到``sources``参数里，然后由这个类出发找到Bean的定义。
     2. [SpringApplication#L261][code-SpringApplicationL261] 初始化[ApplicationContextInitializer][core-ApplicationContextInitializer]列表（见附录）
     3. [SpringApplication#L263][code-SpringApplicationL263] 初始化[ApplicationListener][core-ApplicationListener]列表（见附录）
 1. [SpringApplication#L1186][code-SpringApplicationL1186] -> ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]，进入运行阶段
@@ -33,8 +32,7 @@ public class SampleApplication {
 
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
 
-1. [SpringApplication#L303][code-SpringApplicationL303] 初始化[SpringApplicationRunListeners][code-SpringApplicationRunListeners]([SpringApplicationRunListener][boot-SpringApplicationRunListener]的集合)。
-它内部只包含[EventPublishingRunListener][boot-EventPublishingRunListener]。
+1. [SpringApplication#L303][code-SpringApplicationL303] 初始化[SpringApplicationRunListeners][code-SpringApplicationRunListeners] ([SpringApplicationRunListener][boot-SpringApplicationRunListener]的集合)。它内部只包含[EventPublishingRunListener][boot-EventPublishingRunListener]。
 1. [SpringApplication#L304][code-SpringApplicationL304] 推送[ApplicationStartedEvent][boot-ApplicationStartedEvent]给所有的[ApplicationListener][core-ApplicationListener]（见附录）。 下面是关心此事件的listener：
     1. [LiquibaseServiceLocatorApplicationListener][boot-LiquibaseServiceLocatorApplicationListener]
     1. [LoggingApplicationListener][boot-LoggingApplicationListener]（见附录）
@@ -62,8 +60,7 @@ public class SampleApplication {
 ``SpringApplication#run(args)``[#L297][code-SpringApplicationL297]
 
 1. [SpringApplication#L311][code-SpringApplicationL311]->``SpringApplication#createApplicationContext()``[#L583][code-SpringApplicationL583]创建[ApplicationContext][core-ApplicationContext]。可以看到实际上创建的是[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]或[AnnotationConfigEmbeddedWebApplicationContext][boot-AnnotationConfigEmbeddedWebApplicationContext]。
-  1. 在构造[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]的时候，间接注册了一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]的Bean：[ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]。
-  经由[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader][构造函数][code-AnnotatedBeanDefinitionReader#L83]->[AnnotationConfigUtils.registerAnnotationConfigProcessors][code-AnnotationConfigUtils#L160]。
+  1. 在构造[AnnotationConfigApplicationContext][core-AnnotationConfigApplicationContext]的时候，间接注册了一个[BeanDefinitionRegistryPostProcessor][core-BeanDefinitionRegistryPostProcessor]的Bean：[ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]。经由[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader][构造函数][code-AnnotatedBeanDefinitionReader#L83]->[AnnotationConfigUtils.registerAnnotationConfigProcessors][code-AnnotationConfigUtils#L160]。
 1. [SpringApplication#L313][code-SpringApplicationL313]->``SpringApplication#prepareContext(...)``[#L344][code-SpringApplicationL344]准备[ApplicationContext][core-ApplicationContext]
   1. [SpringApplication#L347][code-SpringApplicationL347]->``context.setEnvironment(environment)``，把之前准备好的[Environment][core-Environment]塞给[ApplicationContext][core-ApplicationContext]
   1. [SpringApplication#L348][code-SpringApplicationL348]->``postProcessApplicationContext(context)``[#L605][code-SpringApplication#L605]，给[ApplicationContext][core-ApplicationContext]设置了一些其他东西
@@ -93,29 +90,24 @@ public class SampleApplication {
   1. 给beanFactory设置了[SpEL解析器][core-StandardBeanExpressionResolver]
   1. 给beanFactory设置了[PropertyEditorRegistrar][core-PropertyEditorRegistrar]
   1. 给beanFactory添加了[ApplicationContextAwareProcessor][code-ApplicationContextAwareProcessor]（[BeanPostProcessor][core-BeanPostProcessor]的实现类），需要注意的是它是第一个被添加到[BeanFactory][core-BeanFactory]的[BeanPostProcessor][core-BeanPostProcessor]
-  1. 给beanFactory设置忽略解析以下类的依赖：[ResourceLoaderAware][core-ResourceLoaderAware]、[ApplicationEventPublisherAware][core-ApplicationEventPublisherAware]、[MessageSourceAware][core-MessageSourceAware]、[ApplicationContextAware][core-ApplicationContextAware]、[EnvironmentAware][core-EnvironmentAware]。
-  原因是注入这些回调接口本身没有什么意义。
+  1. 给beanFactory设置忽略解析以下类的依赖：[ResourceLoaderAware][core-ResourceLoaderAware]、[ApplicationEventPublisherAware][core-ApplicationEventPublisherAware]、[MessageSourceAware][core-MessageSourceAware]、[ApplicationContextAware][core-ApplicationContextAware]、[EnvironmentAware][core-EnvironmentAware]。原因是注入这些回调接口本身没有什么意义。
   1. 给beanFactory添加了以下类的依赖解析：[BeanFactory][core-BeanFactory]、[ResourceLoader][core-ResourceLoader]、[ApplicationEventPublisher][core-ApplicationEventPublisher]、[ApplicationContext][core-ApplicationContext]
   1. 给beanFactory添加[LoadTimeWeaverAwareProcessor][core-LoadTimeWeaverAwareProcessor]用来处理[LoadTimeWeaverAware][core-LoadTimeWeaverAware]的回调，在和AspectJ集成的时候会用到
-  1. 把``getEnvironment()``作为Bean添加到beanFactory中，Bean Name: environment
-  1. 把``getEnvironment().getSystemProperties()``作为Bean添加到beanFactory中，Bean Name: systemProperties
-  1. 把``getEnvironment().getSystemEnvironment()``作为Bean添加到beanFactory中，Bean Name: systemEnvironment
+  1. 把``getEnvironment()``作为Bean添加到beanFactory中，Bean Name: ``environment``
+  1. 把``getEnvironment().getSystemProperties()``作为Bean添加到beanFactory中，Bean Name: ``systemProperties``
+  1. 把``getEnvironment().getSystemEnvironment()``作为Bean添加到beanFactory中，Bean Name: ``systemEnvironment``
 1. [AbstractApplicationContext#L520][code-AbstractApplicationContext#L520]->``postProcessBeanFactory(beanFactory)``，后置处理[BeanFactory][core-BeanFactory]，实际啥都没做
-1. [AbstractApplicationContext#L523][code-AbstractApplicationContext#L523]->``invokeBeanFactoryPostProcessors(beanFactory)``，
-利用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对beanFactory做后置处理。调用此方法时有四个[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]：
+1. [AbstractApplicationContext#L523][code-AbstractApplicationContext#L523]->``invokeBeanFactoryPostProcessors(beanFactory)``，利用[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]，对beanFactory做后置处理。调用此方法时有四个[BeanFactoryPostProcessor][core-BeanFactoryPostProcessor]：
   1. [SharedMetadataReaderFactoryContextInitializer][code-SharedMetadataReaderFactoryContextInitializer]的内部类[CachingMetadataReaderFactoryPostProcessor][code-CachingMetadataReaderFactoryPostProcessor]，是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L57][code-SharedMetadataReaderFactoryContextInitializer#L57]
   1. [ConfigurationWarningsApplicationContextInitializer][boot-ConfigurationWarningsApplicationContextInitializer]的内部类[ConfigurationWarningsPostProcessor][code-ConfigurationWarningsApplicationContextInitializer#L75]，是在 **创建及准备ApplicationContext 2.3** 时添加的：[#L60][code-ConfigurationWarningsApplicationContextInitializer#L60]
   1. [ConfigFileApplicationListener][boot-ConfigFileApplicationListener]的内部类[PropertySourceOrderingPostProcessor][code-PropertySourceOrderingPostProcessor]，是在 **创建及准备ApplicationContext 2.6** 时添加的：[#L158][code-ConfigFileApplicationListener#L158]->[#L199][code-ConfigFileApplicationListener#L199]->[#L244][code-ConfigFileApplicationListener#L244]
-  1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]，负责读取[BeanDefinition][core-BeanDefinition]
-  是在 **创建及准备ApplicationContext 1.1** 时添加的
+  1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]，负责读取[BeanDefinition][core-BeanDefinition]是在 **创建及准备ApplicationContext 1.1** 时添加的
 1. [AbstractApplicationContext#L526][code-AbstractApplicationContext#L526]->``registerBeanPostProcessors(beanFactory)``，注册[BeanPostProcessor][core-BeanPostProcessor]
 1. [AbstractApplicationContext#L529][code-AbstractApplicationContext#L529]->``initMessageSource()``[#L704][code-AbstractApplicationContext#L704]，初始化[MessageSource][core-MessageSource]，不过其实此时的[MessageSource][core-MessageSource]是个Noop对象。
 1. [AbstractApplicationContext#L532][code-AbstractApplicationContext#L532]->``initApplicationEventMulticaster()``[#L739][code-AbstractApplicationContext#L739]，初始化[ApplicationEventMulticaster][core-ApplicationEventMulticaster]。
 1. [AbstractApplicationContext#L535][code-AbstractApplicationContext#L535]->``onRefresh()``[#L793][code-AbstractApplicationContext#L793]，这个方法啥都没做
-1. [AbstractApplicationContext#L538][code-AbstractApplicationContext#L538]->``registerListeners()``[#L801][code-AbstractApplicationContext#L801]，把自己的[ApplicationListener][core-ApplicationListener]注册到[ApplicationEventMulticaster][core-ApplicationEventMulticaster]里，
-并且将之前因为没有[ApplicationEventMulticaster][core-ApplicationEventMulticaster]而无法发出的[ApplicationEvent][core-ApplicationEvent]发送出去。
-1. [AbstractApplicationContext#L541][code-AbstractApplicationContext#L541]->``finishBeanFactoryInitialization``[#L828][code-AbstractApplicationContext#L828]。
-注意[#L861][code-AbstractApplicationContext#L861]，在这一步的时候才会实例化所有non-lazy-init bean，这里说的实例化不只是new而已，注入、[BeanPostProcessor][core-BeanPostProcessor]都会执行。
+1. [AbstractApplicationContext#L538][code-AbstractApplicationContext#L538]->``registerListeners()``[#L801][code-AbstractApplicationContext#L801]，把自己的[ApplicationListener][core-ApplicationListener]注册到[ApplicationEventMulticaster][core-ApplicationEventMulticaster]里，并且将之前因为没有[ApplicationEventMulticaster][core-ApplicationEventMulticaster]而无法发出的[ApplicationEvent][core-ApplicationEvent]发送出去。
+1. [AbstractApplicationContext#L541][code-AbstractApplicationContext#L541]->``finishBeanFactoryInitialization``[#L828][code-AbstractApplicationContext#L828]。注意[#L861][code-AbstractApplicationContext#L861]，在这一步的时候才会实例化所有non-lazy-init bean，这里说的实例化不只是new而已，注入、[BeanPostProcessor][core-BeanPostProcessor]都会执行。
 1. [AbstractApplicationContext#L544][code-AbstractApplicationContext#L544]->``finishRefresh()``[#L869][code-AbstractApplicationContext#L869]。
   1. 在[#L877][code-AbstractApplicationContext#L877]发送了[ContextRefreshedEvent][core-ContextRefreshedEvent]
 
