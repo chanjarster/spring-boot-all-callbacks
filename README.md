@@ -312,7 +312,7 @@ TODO
 
 ### StandardEnvironment
 
-[StandardEnvironment][core-StandardEnvironment]有一个[MutablePropertySources][core-MutablePropertySources]，它里面有多个[PropertySource][core-PropertySource]，[PropertySource][core-PropertySource]负责提供property（即property的提供源），目前已知的[PropertySource][core-PropertySource]实现有：MapPropertySource、SystemEnvironmentPropertySource、CommandLinePropertySource等。当[StandardEnvironment][core-StandardEnvironment]查找property值的时候，是从[MutablePropertySources][core-MutablePropertySources]里依次查找的，而且一旦查找到就不再查找，也就是说如果要覆盖property的值，那么就得提供顺序在前的[PropertySource][core-PropertySource]。
+[StandardEnvironment][core-StandardEnvironment]有一个[MutablePropertySources][core-MutablePropertySources]，它里面有多个[PropertySource][core-PropertySource]，[PropertySource][core-PropertySource]负责提供property（即property的提供源），目前已知的[PropertySource][core-PropertySource]实现有：[MapPropertySource][core-MapPropertySource]、[SystemEnvironmentPropertySource][core-SystemEnvironmentPropertySource]、[CommandLinePropertySource][core-CommandLinePropertySource]等。当[StandardEnvironment][core-StandardEnvironment]查找property值的时候，是从[MutablePropertySources][core-MutablePropertySources]里依次查找的，而且一旦查找到就不再查找，也就是说如果要覆盖property的值，那么就得提供顺序在前的[PropertySource][core-PropertySource]。
 
 ### ConfigFileApplicationListener
 
@@ -322,9 +322,7 @@ TODO
 
 ### ApplicationContextAwareProcessor
 
-[javadoc][code-ApplicationContextAwareProcessor]
-
-ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc这个类用来调用以下接口的回调方法：
+[ApplicationContextAwareProcessor][code-ApplicationContextAwareProcessor]实现了[BeanPostProcessor][core-BeanPostProcessor]接口，根据javadoc这个类用来调用以下接口的回调方法：
 
 1. [EnvironmentAware][core-EnvironmentAware]
 1. [EmbeddedValueResolverAware][core-EmbeddedValueResolverAware]
@@ -345,7 +343,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
 
 ### AnnotatedBeanDefinitionReader
 
-[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader]在其构造函数内部间接([AnnotationConfigUtils#L145][code-AnnotationConfigUtils#L145])的给[BeanFactory][core-BeanFactory]注册了几个用来处理Spring关心的注解的类。
+[AnnotatedBeanDefinitionReader][core-AnnotatedBeanDefinitionReader]在其构造函数内部间接([AnnotationConfigUtils#L145][code-AnnotationConfigUtils#L145])的给[BeanFactory][core-BeanFactory]注册了几个与[BeanDefinition][core-BeanDefinition]相关注解的处理器。
 
 1. [ConfigurationClassPostProcessor][core-ConfigurationClassPostProcessor]
 1. [AutowiredAnnotationBeanPostProcessor][core-AutowiredAnnotationBeanPostProcessor]
@@ -394,6 +392,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [code-AbstractApplicationContext#L520]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L520
   [code-AbstractApplicationContext#L523]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L523
   [code-AbstractApplicationContext#L526]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L526
+  [code-AbstractApplicationContext#L529]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L529
   [code-AbstractApplicationContext#L575]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L575
   [code-AbstractApplicationContext#L611]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L611
   [code-AbstractApplicationContext#L625]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L625
@@ -410,6 +409,7 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [code-AbstractApplicationContext#L828]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L828
   [code-AbstractApplicationContext#L861]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L861
   [code-AbstractApplicationContext#L869]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L869
+  [code-AbstractApplicationContext#L877]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java#L877
   [code-AnnotatedBeanDefinitionReader#L83]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotatedBeanDefinitionReader.java#L83
   [code-AnnotationConfigApplicationContext#L51]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigApplicationContext.java#L51
   [code-AnnotationConfigUtils#L145]: https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-context/src/main/java/org/springframework/context/annotation/AnnotationConfigUtils.java#L145
@@ -526,6 +526,9 @@ ApplicationContextAwareProcessor实现了BeanPostProcessor接口，根据javadoc
   [core-CommonAnnotationBeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/annotation/CommonAnnotationBeanPostProcessor.html
   [core-EventListenerMethodProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/context/event/EventListenerMethodProcessor.html
   [core-PersistenceAnnotationBeanPostProcessor]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/orm/jpa/support/PersistenceAnnotationBeanPostProcessor.html
+  [core-MapPropertySource]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/core/env/MapPropertySource.html
+  [core-SystemEnvironmentPropertySource]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/core/env/SystemEnvironmentPropertySource.html
+  [core-CommandLinePropertySource]: http://docs.spring.io/spring/docs/4.3.3.RELEASE/javadoc-api/org/springframework/core/env/CommandLinePropertySource.html
   [ref-boot-features-condition-annotations]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-condition-annotations
   [ref-boot-features-custom-log-configuration]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-custom-log-configuration
   [ref-boot-features-external-config]: http://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/htmlsingle/#boot-features-external-config
