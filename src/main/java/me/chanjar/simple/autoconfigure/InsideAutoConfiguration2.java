@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import static me.chanjar.simple.SpringCallbackLogger.LOGGER;
 
 /**
+ * 在Application扫描路径范围内的Auto-Configuration。
+ * 用来说明AutoConfigureBefore和ConditionalOnMissingBean是失效的。
  * Created by qianjia on 2016/10/4.
  */
 @Configuration

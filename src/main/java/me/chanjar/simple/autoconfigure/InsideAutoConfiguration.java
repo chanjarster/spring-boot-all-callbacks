@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import static me.chanjar.simple.SpringCallbackLogger.LOGGER;
 
 /**
+ * 在Application扫描路径范围内的Auto-Configuration。
+ * 用来说明它是被提前加载的。
  * Created by qianjia on 2016/10/4.
  */
 @Configuration

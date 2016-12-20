@@ -15,4 +15,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   me.chanjar.simple.autoconfigure.InsideAutoConfiguration2,\
   me.chanjar.outside.autoconfigure.OutsideAutoConfiguration,\
   me.chanjar.outside.autoconfigure.OutsideAutoConfiguration2,\
-  me.chanjar.outside.autoconfigure.UselessDeferredImportSelectorAutoConfiguration
+  me.chanjar.outside.autoconfigure.UselessDeferredImportSelectorAutoConfiguration,\
+  me.chanjar.outside.autoconfigure.BeanPostProcessorAutoConfiguration,\
+  me.chanjar.outside.autoconfigure.ImportBeanDefinitionRegistrarAutoConfiguration

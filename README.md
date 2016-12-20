@@ -243,13 +243,19 @@ public class SampleApplication {
 1. 加载方式不同：
     * 普通[@Configuration][core-Configuration]则是通过扫描package path加载的 
     * [Auto-configuration][ref-using-boot-auto-configuration]的是通过读取``classpath*:META-INF/spring.factories``中key等于``org.springframework.boot.autoconfigure.EnableAutoConfiguration``的property列出的[@Configuration][core-Configuration]加载的
-1. 加载顺序不同：普通[@Configuration][core-Configuration]的加载永远在[Auto-configuration][ref-using-boot-auto-configuration]之前
+1. 加载顺序不同：普通[@Configuration][core-Configuration]的加载在[Auto-configuration][ref-using-boot-auto-configuration]之前，但是有例外情况，看下面。
 1. 内部加载顺序可控上的不同：
     * 普通[@Configuration][core-Configuration]则无法控制加载顺序
     * [Auto-configuration][ref-using-boot-auto-configuration]可以使用[@AutoConfigureOrder][boot-AutoConfigureOrder]、[@AutoConfigureBefore][boot-AutoConfigureBefore]、[@AutoConfigureAfter][boot-AutoConfigureAfter]
 
+以下情况下[Auto-configuration][ref-using-boot-auto-configuration]会在普通[@Configuration][core-Configuration]前加载：
 
-参考[EnableAutoConfiguration][boot-EnableAutoConfiguration]和附录[EnableAutoConfigurationImportSelector][boot-EnableAutoConfigurationImportSelector]了解Spring boot内部处理机制
+1. [Auto-configuration][ref-using-boot-auto-configuration]如果出现在最初的扫描路径里（@ComponentScan），就会被提前加载到，然后被当作普通的[@Configuration][core-Configuration]处理，这样[@AutoConfigureBefore][boot-AutoConfigureBefore]和[@AutoConfigureAfter][boot-AutoConfigureAfter]就没用了。参看例子代码里的InsideAutoConfiguration和InsideAutoConfiguration2。
+1. [Auto-configuration][ref-using-boot-auto-configuration]如果提供[BeanPostProcessor][core-BeanPostProcessor]，那么它会被提前加载。参见例子代码里的BeanPostProcessorAutoConfiguration。
+1. [Auto-configuration][ref-using-boot-auto-configuration]如果使用了[ImportBeanDefinitionRegistrar][core-ImportBeanDefinitionRegistrar]，那么[ImportBeanDefinitionRegistrar][core-ImportBeanDefinitionRegistrar]会被提前加载。参见例子代码里的ImportBeanDefinitionRegistrarAutoConfiguration。
+1. [Auto-configuration][ref-using-boot-auto-configuration]如果使用了[ImportSelector][core-ImportSelector]，那么[ImportSelector][core-ImportSelector]会被提前加载。参见例子代码里的UselessDeferredImportSelectorAutoConfiguration。
+
+参考[EnableAutoConfiguration][boot-EnableAutoConfiguration]和附录[EnableAutoConfigurationImportSelector][boot-EnableAutoConfigurationImportSelector]了解Spring boot内部处理机制。
 
 
 ### AnnotatedBeanDefinitionReader
@@ -286,12 +292,7 @@ public class SampleApplication {
 实际上是在第3步里，[@SpringBootApplication][boot-SpringBootApplication]存在注解[@EnableAutoConfiguration][boot-EnableAutoConfiguration]，它使用了[EnableAutoConfigurationImportSelector][boot-EnableAutoConfigurationImportSelector]，
 [EnableAutoConfigurationImportSelector][boot-EnableAutoConfigurationImportSelector]是一个[DeferredImportSelector][core-DeferredImportSelector]，所以也就是说，[Auto-configuration][ref-using-boot-auto-configuration]是在普通[@Configuration][core-Configuration]之后再加载的。
 
-不过需要注意以下陷阱：
-
-1. [Auto-configuration][ref-using-boot-auto-configuration]不能出现在最初的扫描路径里，这样就会被提前加载到，然后被当作普通的[@Configuration][core-Configuration]处理，这样[@AutoConfigureBefore][boot-AutoConfigureBefore]和[@AutoConfigureAfter][boot-AutoConfigureAfter]就没用了。
-参看例子代码里的InsideAutoConfiguration和InsideAutoConfiguration2。
-1. [Auto-configuration][ref-using-boot-auto-configuration]里再使用[DeferredImportSelector][core-DeferredImportSelector]和使用[ImportSelector][core-ImportSelector]效果是一样的，不会再被延后处理。参见例子代码里的UselessDeferredImportSelectorAutoConfiguration。
-
+顺带一提，如果[Auto-configuration][ref-using-boot-auto-configuration]里再使用[DeferredImportSelector][core-DeferredImportSelector]，那么效果和使用[ImportSelector][core-ImportSelector]效果是一样的，不会再被延后处理。参见例子代码里的UselessDeferredImportSelectorAutoConfiguration。
 
 ### EnableAutoConfigurationImportSelector
 
